@@ -16,3 +16,5 @@ Check DNS server
 ```
 dig @127.0.0.1 -p 5300 dev51.hoge
 ```
+
+ref: https://gist.github.com/walm/0d67b4fb2d5daf3edd4fad3e13b162cb
