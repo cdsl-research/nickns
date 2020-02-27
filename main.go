@@ -11,8 +11,8 @@ import (
 )
 
 type Machine struct {
-	Id         int
-	Name       string
+	Id   int
+	Name string
 }
 
 type Machines []Machine
