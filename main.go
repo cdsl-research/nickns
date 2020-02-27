@@ -34,6 +34,7 @@ func ssh_cmd(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, er
 
 	session.Stdout = &buf
 	remote_command := "cat /tmp/result"
+  // remote_command := "vim-cmd vmsvc/getallvms"
 	if err := session.Run(remote_command); err != nil {
 		return buf, err
 	}
