@@ -70,7 +70,8 @@ func parseResult(buf bytes.Buffer) Machines {
 	}
 }
 
-func main() {
+func resolveRecordTypeA(fqdn string) string {
+  // ssh connect
 	ip := "127.0.0.1"
 	port := "2200"
 	user := "root"
@@ -83,11 +84,63 @@ func main() {
 		},
 	}
 
-	b, err := ssh_cmd(ip, port, config)
+	b, err := sshCommand(ip, port, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	vms := parse_result(b)
-	fmt.Println(vms)
+	vms := parseResult(b)
+  for _,vm := range vms {
+    // debug:: println(vm.Name, "and", fqdn)
+    if vm.Name == strings.Split(fqdn, ".")[0] {
+      return "192.168.0.1" // Hit
+    }
+  }
+  return "" // UnHit
+}
+
+func parseQuery(m *dns.Msg) {
+	for _, q := range m.Question {
+		switch q.Qtype {
+		case dns.TypeA:
+      ip := resolveRecordTypeA(q.Name)
+			if ip != "" {
+		    log.Printf("[Hit]\tQuery for %s\n", q.Name)
+				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
+				if err == nil {
+					m.Answer = append(m.Answer, rr)
+				}
+			} else {
+		    log.Printf("[UnHit]\tQuery for %s\n", q.Name)
+      }
+		}
+	}
+}
+
+func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
+	m := new(dns.Msg)
+	m.SetReply(r)
+	m.Compress = false
+
+	switch r.Opcode {
+	case dns.OpcodeQuery:
+		parseQuery(m)
+	}
+
+	w.WriteMsg(m)
+}
+
+func main() {
+  // attach request handler func
+	dns.HandleFunc("hoge.", dnsRequestHandler)
+
+  // dns server 
+  port := 5300
+	server := &dns.Server{Addr: ":" + strconv.Itoa(port), Net: "udp"}
+	log.Printf("Starting at %d\n", port)
+	err := server.ListenAndServe()
+	defer server.Shutdown()
+	if err != nil {
+		log.Fatalf("Failed to start server: %s\n ", err.Error())
+	}
 }
