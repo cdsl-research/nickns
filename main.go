@@ -3,11 +3,14 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+  "golang.org/x/crypto/ssh"
+  // "github.com/cybozu-go/well"
+  "github.com/miekg/dns"
 )
 
 type Machine struct {
