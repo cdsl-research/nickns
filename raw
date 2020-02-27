@@ -1,0 +1,7 @@
+Vmid          Name                                        File                                     Guest OS         Version                                                                                                                                         Annotation
+16     elasticsearch-lb-j    [StoreNAS-Jasmine] elasticsearch-lb-j/elasticsearch-lb-j.vmx     ubuntu64Guest         vmx-14    Elasticsearchクラスタのロードバランサー
+198    dev51                 [StoreNAS-Jasmine] dev51/dev51.vmx                               ubuntu64Guest         vmx-14
+21     xxxxxx-vm1            [StorePCIe] xxxxxx-vm1/xxxxxx-vm1.vmx                            ubuntu64Guest         vmx-14
+22     xxx-vm1               [StorePCIe] jasmine/jasmine.vmx                                  ubuntu64Guest         vmx-14
+3      elasticsearch-j1      [StoreNAS-Jasmine] elasticsearch-j1/elasticsearch-j1.vmx         ubuntu64Guest         vmx-14    Elasticsearchクラスタのノード
+35     proxy2                [StorePCIe] proxy2/proxy2.vmx                                    ubuntu64Guest         vmx-14
