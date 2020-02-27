@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-  "golang.org/x/crypto/ssh"
-  // "github.com/cybozu-go/well"
-  "github.com/miekg/dns"
+	"golang.org/x/crypto/ssh"
+	// "github.com/cybozu-go/well"
+	"github.com/miekg/dns"
 )
 
 type Machine struct {
@@ -71,7 +71,7 @@ func parseResult(buf bytes.Buffer) Machines {
 }
 
 func resolveRecordTypeA(fqdn string) string {
-  // ssh connect
+	// ssh connect
 	ip := "127.0.0.1"
 	port := "2200"
 	user := "root"
@@ -90,29 +90,29 @@ func resolveRecordTypeA(fqdn string) string {
 	}
 
 	vms := parseResult(b)
-  for _,vm := range vms {
-    // debug:: println(vm.Name, "and", fqdn)
-    if vm.Name == strings.Split(fqdn, ".")[0] {
-      return "192.168.0.1" // Hit
-    }
-  }
-  return "" // UnHit
+	for _, vm := range vms {
+		// debug:: println(vm.Name, "and", fqdn)
+		if vm.Name == strings.Split(fqdn, ".")[0] {
+			return "192.168.0.1" // Hit
+		}
+	}
+	return "" // UnHit
 }
 
 func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
 		switch q.Qtype {
 		case dns.TypeA:
-      ip := resolveRecordTypeA(q.Name)
+			ip := resolveRecordTypeA(q.Name)
 			if ip != "" {
-		    log.Printf("[Hit]\tQuery for %s\n", q.Name)
+				log.Printf("[Hit]\tQuery for %s\n", q.Name)
 				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
 				if err == nil {
 					m.Answer = append(m.Answer, rr)
 				}
 			} else {
-		    log.Printf("[UnHit]\tQuery for %s\n", q.Name)
-      }
+				log.Printf("[UnHit]\tQuery for %s\n", q.Name)
+			}
 		}
 	}
 }
@@ -131,11 +131,11 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 }
 
 func main() {
-  // attach request handler func
+	// attach request handler func
 	dns.HandleFunc("hoge.", dnsRequestHandler)
 
-  // dns server 
-  port := 5300
+	// dns server
+	port := 5300
 	server := &dns.Server{Addr: ":" + strconv.Itoa(port), Net: "udp"}
 	log.Printf("Starting at %d\n", port)
 	err := server.ListenAndServe()
