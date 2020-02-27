@@ -13,10 +13,6 @@ import (
 type Machine struct {
 	Id         int
 	Name       string
-	File       string
-	GuestOs    string
-	Version    string
-	Annotation string
 }
 
 type Machines []Machine
