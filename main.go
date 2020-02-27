@@ -20,7 +20,7 @@ type Machine struct {
 
 type Machines []Machine
 
-func ssh_cmd(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
+func sshCommand(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
 	var buf bytes.Buffer
 
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
@@ -45,7 +45,7 @@ func ssh_cmd(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, er
 	return buf, nil
 }
 
-func parse_result(buf bytes.Buffer) Machines {
+func parseResult(buf bytes.Buffer) Machines {
 	r := regexp.MustCompile(`^\d.+`)
 	var vms Machines
 	for {
