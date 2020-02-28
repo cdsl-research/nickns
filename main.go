@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"io/ioutil"
 
 	"golang.org/x/crypto/ssh"
 	// "github.com/cybozu-go/well"
@@ -44,8 +45,8 @@ func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffe
 	defer session.Close()
 
 	session.Stdout = &buf
-	remote_command := "cat /tmp/result"
-	// remote_command := "vim-cmd vmsvc/getallvms"
+	// remote_command := "cat /tmp/result"
+	remote_command := "vim-cmd vmsvc/getallvms"
 	if err := session.Run(remote_command); err != nil {
 		return buf, err
 	}
@@ -78,7 +79,7 @@ func parseResult(buf bytes.Buffer) Machines {
 	}
 }
 
-func getVmIp(ip string, port string, config *ssh.ClientConfig) string {
+func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string {
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
 	if err != nil {
 		log.Println(err.Error())
@@ -95,8 +96,8 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig) string {
 
 	var buf bytes.Buffer
 	session.Stdout = &buf
-	remote_command := "echo 192.168.100.100"
-	// remote_command := "vim-cmd vmsvc/get.summary 16 | grep ipAddress | grep -o [0-9\.]\\+"
+	// remote_command := "echo 192.168.100.100"
+	remote_command := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", vmid)
 	if err := session.Run(remote_command); err != nil {
 		log.Println(err.Error())
 		return ""
@@ -105,16 +106,25 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig) string {
 }
 
 func resolveRecordTypeA(fqdn string) string {
+  // ssh key
+	buf, err := ioutil.ReadFile("./old/id_rsa")
+	if err != nil {
+		panic(err)
+	}
+	key, err := ssh.ParsePrivateKey(buf)
+	if err != nil {
+		panic(err)
+	}
+
 	// ssh connect
-	ip := "127.0.0.1"
-	port := "2200"
+	ip := "192.168.0.20"
+	port := "22"
 	user := "root"
-	pass := "THEPASSWORDYOUCREATED"
 	config := &ssh.ClientConfig{
 		User:            user,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Auth: []ssh.AuthMethod{
-			ssh.Password(pass),
+			ssh.PublicKeys(key),
 		},
 	}
 
@@ -128,7 +138,7 @@ func resolveRecordTypeA(fqdn string) string {
 		// debug:: println(vm.Name, "and", fqdn)
 		if vm.Name == strings.Split(fqdn, ".")[0] {
 			// return "192.168.0.1" // Hit
-			return getVmIp(ip, port, config) // Hit
+			return getVmIp(ip, port, config, vm.Id) // Hit
 		}
 	}
 	return "" // UnHit
