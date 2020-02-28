@@ -78,6 +78,32 @@ func parseResult(buf bytes.Buffer) Machines {
 	}
 }
 
+func getVmIp(ip string, port string, config *ssh.ClientConfig) string {
+	conn, err := ssh.Dial("tcp", ip+":"+port, config)
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	defer conn.Close()
+
+	session, err := conn.NewSession()
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	defer session.Close()
+
+	var buf bytes.Buffer
+	session.Stdout = &buf
+	remote_command := "echo 192.168.100.100"
+	// remote_command := "vim-cmd vmsvc/get.summary 16 | grep ipAddress | grep -o [0-9\.]\\+"
+	if err := session.Run(remote_command); err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	return buf.String()
+}
+
 func resolveRecordTypeA(fqdn string) string {
 	// ssh connect
 	ip := "127.0.0.1"
