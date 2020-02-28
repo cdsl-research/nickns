@@ -7,11 +7,19 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 	// "github.com/cybozu-go/well"
 	"github.com/miekg/dns"
 )
+
+// todo: only support 'A' record
+type QueryCache struct {
+	Fqdn   string
+  IpAddr string
+	Expire time.Time
+}
 
 type Machine struct {
 	Id   int
