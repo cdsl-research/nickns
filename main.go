@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"io/ioutil"
 
 	"golang.org/x/crypto/ssh"
 	// "github.com/cybozu-go/well"
@@ -18,9 +18,11 @@ import (
 // todo: only support 'A' record
 type QueryCache struct {
 	Fqdn   string
-  IpAddr string
+	IpAddr string
 	Expire time.Time
 }
+
+type QueryCaches []QueryCache
 
 type Machine struct {
 	Id   int
@@ -28,6 +30,10 @@ type Machine struct {
 }
 
 type Machines []Machine
+
+// Query Cache
+var cache QueryCaches
+var hasCache = map[string]bool{}
 
 func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
 	var buf bytes.Buffer
@@ -106,7 +112,7 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 }
 
 func resolveRecordTypeA(fqdn string) string {
-  // ssh key
+	// ssh key
 	buf, err := ioutil.ReadFile("./old/id_rsa")
 	if err != nil {
 		panic(err)
@@ -128,17 +134,36 @@ func resolveRecordTypeA(fqdn string) string {
 		},
 	}
 
+	// cache hit
+  if hasCache[fqdn] {
+    log.Printf("[CacheHit] Query for %s\n", fqdn)
+    for _, vm := range cache {
+		  if vm.Fqdn == strings.Split(fqdn, ".")[0] {
+        return vm.IpAddr
+      }
+    }
+  }
+
 	b, err := sshGetAllVms(ip, port, config)
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	vms := parseResult(b)
-	for _, vm := range vms {
+	for _, vm := range parseResult(b) {
 		// debug:: println(vm.Name, "and", fqdn)
-		if vm.Name == strings.Split(fqdn, ".")[0] {
-			// return "192.168.0.1" // Hit
-			return getVmIp(ip, port, config, vm.Id) // Hit
+		if vm.Name == strings.Split(fqdn, ".")[0] { // Hit
+			vmIp := getVmIp(ip, port, config, vm.Id)
+
+      // add cache
+      hasCache[fqdn] = true
+			cache = append(cache, QueryCache{
+				Fqdn:   fqdn,
+				IpAddr: vmIp,
+				Expire: time.Now(),
+			})
+
+			// return "192.168.0.1"
+			return vmIp
 		}
 	}
 	return "" // UnHit
@@ -150,13 +175,13 @@ func parseQuery(m *dns.Msg) {
 		case dns.TypeA:
 			ip := resolveRecordTypeA(q.Name)
 			if ip != "" {
-				log.Printf("[Hit]\tQuery for %s\n", q.Name)
+				log.Printf("[QueryHit] Query for %s\n", q.Name)
 				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
 				if err == nil {
 					m.Answer = append(m.Answer, rr)
 				}
 			} else {
-				log.Printf("[UnHit]\tQuery for %s\n", q.Name)
+				log.Printf("[QueryUnHit] Query for %s\n", q.Name)
 			}
 		}
 	}
