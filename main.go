@@ -135,14 +135,14 @@ func resolveRecordTypeA(fqdn string) string {
 	}
 
 	// cache hit
-  if hasCache[fqdn] {
-    log.Printf("[CacheHit] Query for %s\n", fqdn)
-    for _, vm := range cache {
-		  if vm.Fqdn == strings.Split(fqdn, ".")[0] {
-        return vm.IpAddr
-      }
-    }
-  }
+	if hasCache[fqdn] {
+		log.Printf("[CacheHit] Query for %s\n", fqdn)
+		for _, vm := range cache {
+			if vm.Fqdn == strings.Split(fqdn, ".")[0] {
+				return vm.IpAddr
+			}
+		}
+	}
 
 	b, err := sshGetAllVms(ip, port, config)
 	if err != nil {
@@ -154,8 +154,8 @@ func resolveRecordTypeA(fqdn string) string {
 		if vm.Name == strings.Split(fqdn, ".")[0] { // Hit
 			vmIp := getVmIp(ip, port, config, vm.Id)
 
-      // add cache
-      hasCache[fqdn] = true
+			// add cache
+			hasCache[fqdn] = true
 			cache = append(cache, QueryCache{
 				Fqdn:   fqdn,
 				IpAddr: vmIp,
