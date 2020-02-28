@@ -28,7 +28,7 @@ type Machine struct {
 
 type Machines []Machine
 
-func sshCommand(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
+func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
 	var buf bytes.Buffer
 
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
@@ -92,16 +92,17 @@ func resolveRecordTypeA(fqdn string) string {
 		},
 	}
 
-	b, err := sshCommand(ip, port, config)
+	b, err := sshGetAllVms(ip, port, config)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
 	}
 
 	vms := parseResult(b)
 	for _, vm := range vms {
 		// debug:: println(vm.Name, "and", fqdn)
 		if vm.Name == strings.Split(fqdn, ".")[0] {
-			return "192.168.0.1" // Hit
+			// return "192.168.0.1" // Hit
+			return getVmIp(ip, port, config) // Hit
 		}
 	}
 	return "" // UnHit
