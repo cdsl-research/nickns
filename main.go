@@ -167,7 +167,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 
 func main() {
 	// attach request handler func
-	dns.HandleFunc("hoge.", dnsRequestHandler)
+	dns.HandleFunc("local.", dnsRequestHandler)
 
 	// dns server
 	port := 5300
