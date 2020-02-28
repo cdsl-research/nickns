@@ -15,25 +15,25 @@ import (
 	"github.com/miekg/dns"
 )
 
-// todo: only support 'A' record
-type QueryCache struct {
-	Fqdn   string
-	IpAddr string
-	Expire time.Time
-}
-
-type QueryCaches []QueryCache
-
+// For command result
 type Machine struct {
 	Id   int
 	Name string
 }
-
 type Machines []Machine
 
-// Query Cache
+// Manage cache existing
 var cache QueryCaches
 var hasCache = map[string]bool{}
+
+// Manage cache detail
+type QueryCache struct {
+	// todo: only support 'A' record
+	Fqdn   string
+	IpAddr string
+	Expire time.Time
+}
+type QueryCaches []QueryCache
 
 func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
 	var buf bytes.Buffer
@@ -60,31 +60,6 @@ func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffe
 	return buf, nil
 }
 
-func parseResult(buf bytes.Buffer) Machines {
-	r := regexp.MustCompile(`^\d.+`)
-	var vms Machines
-	for {
-		st, err := buf.ReadString('\n')
-		if err != nil {
-			return vms
-		}
-
-		if !r.MatchString(st) {
-			continue
-		}
-
-		slice := strings.Split(st, "    ")
-		slice0, err := strconv.Atoi(slice[0])
-		if err != nil {
-			slice0 = -1
-		}
-		vms = append(vms, Machine{
-			Id:   slice0,
-			Name: strings.TrimSpace(slice[1]),
-		})
-	}
-}
-
 func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string {
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
 	if err != nil {
@@ -109,6 +84,31 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 		return ""
 	}
 	return buf.String()
+}
+
+func parseResult(buf bytes.Buffer) Machines {
+	r := regexp.MustCompile(`^\d.+`)
+	var vms Machines
+	for {
+		st, err := buf.ReadString('\n')
+		if err != nil {
+			return vms
+		}
+
+		if !r.MatchString(st) {
+			continue
+		}
+
+		slice := strings.Split(st, "    ")
+		slice0, err := strconv.Atoi(slice[0])
+		if err != nil {
+			slice0 = -1
+		}
+		vms = append(vms, Machine{
+			Id:   slice0,
+			Name: strings.TrimSpace(slice[1]),
+		})
+	}
 }
 
 func resolveRecordTypeA(fqdn string) string {
@@ -138,6 +138,7 @@ func resolveRecordTypeA(fqdn string) string {
 	if hasCache[fqdn] {
 		log.Printf("[CacheHit] Query for %s\n", fqdn)
 		for _, vm := range cache {
+			// todo: check cache-expire -> del cache from set and array
 			if vm.Fqdn == strings.Split(fqdn, ".")[0] {
 				return vm.IpAddr
 			}
