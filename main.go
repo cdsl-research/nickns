@@ -38,7 +38,7 @@ type QueryCache struct {
 type QueryCaches []QueryCache
 
 // Get VM info from ESXi via SSH
-func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
+func execCommandSsh(ip string, port string, config *ssh.ClientConfig, command string) (bytes.Buffer, error) {
 	var buf bytes.Buffer
 
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
@@ -54,9 +54,7 @@ func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffe
 	defer session.Close()
 
 	session.Stdout = &buf
-	// remoteCommand := "cat /tmp/result"
-	remoteCommand := "vim-cmd vmsvc/getallvms"
-	if err := session.Run(remoteCommand); err != nil {
+	if err := session.Run(command); err != nil {
 		return buf, err
 	}
 
@@ -87,7 +85,7 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 		log.Println(err.Error())
 		return ""
 	}
-	return buf.String()
+	return strings.Replace(buf.String(), "\n", "", -1)
 }
 
 // Parse command result on SshGetAllVms()
@@ -152,7 +150,7 @@ func resolveRecordTypeA(fqdn string) string {
 	}
 
 	// get vm list via ssh
-	b, err := sshGetAllVms(ip, port, config)
+	b, err := execCommandSsh(ip, port, config, "vim-cmd vmsvc/getallvms") // test "cat /tmp/result"
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -180,9 +178,68 @@ func resolveRecordTypeA(fqdn string) string {
 }
 
 // Resolve type 'A' record
-func resolveRecordTypePTR(ipAddr string) string {
-	log.Printf("debug %s => %s\n", ipAddr, "www.example.com.")
-	return "www.example.com."
+func resolveRecordTypePTR(ptrAddr string) string {
+	// ssh key
+	buf, err := ioutil.ReadFile("./old/id_rsa")
+	if err != nil {
+		panic(err)
+	}
+	key, err := ssh.ParsePrivateKey(buf)
+	if err != nil {
+		panic(err)
+	}
+
+	// ssh connect
+	ip := "192.168.0.20"
+	port := "22"
+	user := "root"
+	config := &ssh.ClientConfig{
+		User:            user,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeys(key),
+		},
+	}
+
+	b, err := execCommandSsh(ip, port, config, `
+		for i in $(vim-cmd vmsvc/getallvms | awk '{print $1}' | grep [0-9]\\+)
+		do
+			vim-cmd vmsvc/get.summary $i | egrep "\s+(name|ipAddress)" | grep -o '".*"' \
+			| sed -e ':a;N;$!ba;s/\n/ /g;s/"//g' | grep [0-9\.]\\{7,\\} &
+		done
+	`)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	// println(b.String())
+
+	foundAnswer := ""
+	for {
+		st, err := b.ReadString('\n')
+		if err != nil {
+			break
+		}
+
+		slice := strings.Split(st, " ")
+		vmIp := slice[0]
+		vmFqdn := strings.Replace(slice[1],"\n", "", -1)
+		cache = append(cache, QueryCache{
+			Fqdn: vmFqdn,
+			IpAddr: vmIp,
+			Expire: time.Now(),
+		})
+
+		slice = strings.Split(ptrAddr, ".")
+		if fmt.Sprintf("%s.%s.%s.%s", slice[3], slice[2], slice[1], slice[0]) == vmIp {
+			foundAnswer = vmFqdn
+		}
+	}
+
+	// log.Printf("debug %s => %s\n", foundAnswer, ptrAddr)
+	if foundAnswer == "" {
+		return foundAnswer
+	}
+	return foundAnswer + ".local" + "."
 }
 
 // Parse request query by record type
@@ -192,7 +249,7 @@ func parseQuery(m *dns.Msg) {
 		case dns.TypeA:
 			ip := resolveRecordTypeA(q.Name)
 			if ip != "" {
-				log.Printf("[QueryHit] %s => %s", q.Name, ip)
+				log.Printf("[QueryHit] %s => %s\n", q.Name, ip)
 				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
 				if err == nil {
 					m.Answer = append(m.Answer, rr)
