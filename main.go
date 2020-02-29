@@ -17,7 +17,9 @@ import (
 
 // For command result
 type Machine struct {
-	Id   int
+	// VM ID on ESXi
+	Id int
+	// VM Name on ESXi
 	Name string
 }
 type Machines []Machine
@@ -35,6 +37,7 @@ type QueryCache struct {
 }
 type QueryCaches []QueryCache
 
+// Get VM info from ESXi via SSH
 func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffer, error) {
 	var buf bytes.Buffer
 
@@ -52,14 +55,15 @@ func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffe
 
 	session.Stdout = &buf
 	// remote_command := "cat /tmp/result"
-	remote_command := "vim-cmd vmsvc/getallvms"
-	if err := session.Run(remote_command); err != nil {
+	remoteCommand := "vim-cmd vmsvc/getallvms"
+	if err := session.Run(remoteCommand); err != nil {
 		return buf, err
 	}
 
 	return buf, nil
 }
 
+// Resolve VM ID to VM IPAddr
 func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string {
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
 	if err != nil {
@@ -78,15 +82,16 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 	var buf bytes.Buffer
 	session.Stdout = &buf
 	// remote_command := "echo 192.168.100.100"
-	remote_command := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", vmid)
-	if err := session.Run(remote_command); err != nil {
+	remoteCommand := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", vmid)
+	if err := session.Run(remoteCommand); err != nil {
 		log.Println(err.Error())
 		return ""
 	}
 	return buf.String()
 }
 
-func parseResult(buf bytes.Buffer) Machines {
+// Parse command result on SshGetAllVms()
+func parseResultAllVms(buf bytes.Buffer) Machines {
 	r := regexp.MustCompile(`^\d.+`)
 	var vms Machines
 	for {
@@ -111,7 +116,19 @@ func parseResult(buf bytes.Buffer) Machines {
 	}
 }
 
+// Resolve type 'A' record
 func resolveRecordTypeA(fqdn string) string {
+	// cache hit
+	if hasCache[fqdn] {
+		log.Printf("[CacheHit] Query for %s\n", fqdn)
+		for _, vm := range cache {
+			// todo: check cache-expire -> del cache from set and array
+			if vm.Fqdn == strings.Split(fqdn, ".")[0] {
+				return vm.IpAddr
+			}
+		}
+	}
+
 	// ssh key
 	buf, err := ioutil.ReadFile("./old/id_rsa")
 	if err != nil {
@@ -134,25 +151,17 @@ func resolveRecordTypeA(fqdn string) string {
 		},
 	}
 
-	// cache hit
-	if hasCache[fqdn] {
-		log.Printf("[CacheHit] Query for %s\n", fqdn)
-		for _, vm := range cache {
-			// todo: check cache-expire -> del cache from set and array
-			if vm.Fqdn == strings.Split(fqdn, ".")[0] {
-				return vm.IpAddr
-			}
-		}
-	}
-
+	// get vm list via ssh
 	b, err := sshGetAllVms(ip, port, config)
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	for _, vm := range parseResult(b) {
+	// check a matched host in command result
+	for _, vm := range parseResultAllVms(b) {
 		// debug:: println(vm.Name, "and", fqdn)
 		if vm.Name == strings.Split(fqdn, ".")[0] { // Hit
+			// resolve vmid to ip
 			vmIp := getVmIp(ip, port, config, vm.Id)
 
 			// add cache
@@ -170,6 +179,7 @@ func resolveRecordTypeA(fqdn string) string {
 	return "" // UnHit
 }
 
+// Parse request query by record type
 func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
 		switch q.Qtype {
