@@ -54,7 +54,7 @@ func sshGetAllVms(ip string, port string, config *ssh.ClientConfig) (bytes.Buffe
 	defer session.Close()
 
 	session.Stdout = &buf
-	// remote_command := "cat /tmp/result"
+	// remoteCommand := "cat /tmp/result"
 	remoteCommand := "vim-cmd vmsvc/getallvms"
 	if err := session.Run(remoteCommand); err != nil {
 		return buf, err
@@ -81,7 +81,7 @@ func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 
 	var buf bytes.Buffer
 	session.Stdout = &buf
-	// remote_command := "echo 192.168.100.100"
+	// remoteCommand := "echo 192.168.100.100"
 	remoteCommand := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", vmid)
 	if err := session.Run(remoteCommand); err != nil {
 		log.Println(err.Error())
@@ -120,7 +120,7 @@ func parseResultAllVms(buf bytes.Buffer) Machines {
 func resolveRecordTypeA(fqdn string) string {
 	// cache hit
 	if hasCache[fqdn] {
-		log.Printf("[CacheHit] Query for %s\n", fqdn)
+		log.Printf("[CacheHit] %s\n", fqdn)
 		for _, vm := range cache {
 			// todo: check cache-expire -> del cache from set and array
 			if vm.Fqdn == strings.Split(fqdn, ".")[0] {
@@ -179,6 +179,12 @@ func resolveRecordTypeA(fqdn string) string {
 	return "" // UnHit
 }
 
+// Resolve type 'A' record
+func resolveRecordTypePTR(ipAddr string) string {
+	log.Printf("debug %s => %s\n", ipAddr, "www.example.com.")
+	return "www.example.com."
+}
+
 // Parse request query by record type
 func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
@@ -186,13 +192,24 @@ func parseQuery(m *dns.Msg) {
 		case dns.TypeA:
 			ip := resolveRecordTypeA(q.Name)
 			if ip != "" {
-				log.Printf("[QueryHit] Query for %s\n", q.Name)
+				log.Printf("[QueryHit] %s => %s", q.Name, ip)
 				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
 				if err == nil {
 					m.Answer = append(m.Answer, rr)
 				}
 			} else {
-				log.Printf("[QueryUnHit] Query for %s\n", q.Name)
+				log.Printf("[QueryUnHit] %s\n", q.Name)
+			}
+		case dns.TypePTR:
+			fqdn := resolveRecordTypePTR(q.Name)
+			if fqdn != "" {
+				log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
+				rr, err := dns.NewRR(fmt.Sprintf("%s PTR %s", q.Name, fqdn))
+				if err == nil {
+					m.Answer = append(m.Answer, rr)
+				}
+			} else {
+				log.Printf("[QueryUnHit] %s\n", q.Name)
 			}
 		}
 	}
@@ -214,6 +231,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 func main() {
 	// attach request handler func
 	dns.HandleFunc("local.", dnsRequestHandler)
+	dns.HandleFunc("arpa.", dnsRequestHandler)
 
 	// dns server
 	port := 5300
