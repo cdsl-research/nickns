@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b31af6d8-b028-43c3-a1ea-4255e0e874bf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/tkoyama.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cdsn.iml" afterDir="false" />
+    <list default="true" id="b31af6d8-b028-43c3-a1ea-4255e0e874bf" name="Default Changelist" comment="add PTR Record support">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,6 +31,21 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
   </component>
+  <component name="RunManager">
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="cdsn" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/main.go" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build main.go" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
       <list>
@@ -58,21 +68,81 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1582949678885</updated>
-      <workItem from="1582949687106" duration="445000" />
+      <workItem from="1582949687106" duration="9867000" />
     </task>
+    <task id="LOCAL-00001" summary="add idea files">
+      <created>1582950204403</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1582950204404</updated>
+    </task>
+    <task id="LOCAL-00002" summary="add idea files">
+      <created>1582950213861</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1582950213861</updated>
+    </task>
+    <task id="LOCAL-00003" summary="add comments">
+      <created>1582951679543</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1582951679543</updated>
+    </task>
+    <task id="LOCAL-00004" summary="add PTR Record support">
+      <created>1582958536062</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1582958536062</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add idea files" />
+    <MESSAGE value="fixed a little" />
+    <MESSAGE value="add comments" />
+    <MESSAGE value="add PTR Record support" />
+    <option name="LAST_COMMIT_MESSAGE" value="add PTR Record support" />
   </component>
   <component name="WindowStateProjectService">
     <state x="463" y="202" key="#GOROOT" timestamp="1582949757208">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="463" y="202" key="#GOROOT/0.23.1680.1027@0.23.1680.1027" timestamp="1582949757208" />
-    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1582950203716">
+    <state x="327" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1582955736930">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1582950203716" />
+    <state x="327" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1582955736930" />
+    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1582958620641">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1582958620641" />
+    <state width="1592" height="280" key="GridCell.Tab.0.bottom" timestamp="1582969153292">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state width="1592" height="280" key="GridCell.Tab.0.bottom/0.23.1680.1027@0.23.1680.1027" timestamp="1582969153292" />
+    <state width="1592" height="280" key="GridCell.Tab.0.center" timestamp="1582969153292">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state width="1592" height="280" key="GridCell.Tab.0.center/0.23.1680.1027@0.23.1680.1027" timestamp="1582969153292" />
+    <state width="1592" height="280" key="GridCell.Tab.0.left" timestamp="1582969153291">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state width="1592" height="280" key="GridCell.Tab.0.left/0.23.1680.1027@0.23.1680.1027" timestamp="1582969153291" />
+    <state width="1592" height="280" key="GridCell.Tab.0.right" timestamp="1582969153292">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state width="1592" height="280" key="GridCell.Tab.0.right/0.23.1680.1027@0.23.1680.1027" timestamp="1582969153292" />
+    <state x="463" y="276" key="Vcs.Push.Dialog.v2" timestamp="1582958628093">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="463" y="276" key="Vcs.Push.Dialog.v2/0.23.1680.1027@0.23.1680.1027" timestamp="1582958628093" />
   </component>
 </project>
