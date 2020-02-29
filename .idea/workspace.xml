@@ -27,6 +27,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="GO_FMT" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -69,5 +70,9 @@
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="463" y="202" key="#GOROOT/0.23.1680.1027@0.23.1680.1027" timestamp="1582949757208" />
+    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1582950203716">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1582950203716" />
   </component>
 </project>
