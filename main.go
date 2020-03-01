@@ -223,6 +223,7 @@ func resolveRecordTypePTR(ptrAddr string) string {
 		slice := strings.Split(st, " ")
 		vmIp := slice[0]
 		vmFqdn := strings.Replace(slice[1],"\n", "", -1)
+    hasCache[vmFqdn+".local."] = true
 		cache = append(cache, QueryCache{
 			Fqdn: vmFqdn,
 			IpAddr: vmIp,
