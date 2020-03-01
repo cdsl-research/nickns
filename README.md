@@ -1,8 +1,8 @@
-# cdsn
+# NickNS
 
-CDSN is a DNS Server for ESXi Resources
+NickNS is a DNS Server for ESXi Resources
 
-<img src="https://raw.githubusercontent.com/cdsl-research/cdsn/master/overview.png" width=600>
+<img src="https://raw.githubusercontent.com/cdsl-research/nickns/master/overview.png" width=600>
 
 ## Develop
 
