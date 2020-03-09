@@ -1,5 +1,7 @@
 # NickNS
 
+![](https://github.com/cdsl-research/nickns/workflows/build/badge.svg)
+
 NickNS is a DNS Server for ESXi Resources
 
 <img src="https://raw.githubusercontent.com/cdsl-research/nickns/master/overview.png" width=600>
