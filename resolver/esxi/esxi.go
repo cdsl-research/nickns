@@ -3,22 +3,31 @@ package esxi
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/BurntSushi/toml"
 	"golang.org/x/crypto/ssh"
 )
 
-// For command result
 type Machine struct {
-	// VM ID on ESXi
-	Id int
-	// VM Name on ESXi
-	Name string
+	Id int // VM ID on ESXi
+	Name string // VM Name on ESXi
+	NodeName string // ESXi Node Name
 }
 type Machines []Machine
+
+type esxiNode struct {
+	Name string
+	Address string
+	Port string
+	User string
+	IdentityFile string `toml:"identity_file"`
+}
+type esxiNodes map[string]esxiNode
 
 // Parse command result on SshGetAllVms()
 func ParseResultAllVms(buf bytes.Buffer) Machines {
@@ -95,4 +104,63 @@ func GetVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 		return ""
 	}
 	return strings.Replace(buf.String(), "\n", "", -1)
+}
+
+// Get SSH Info into ESXi Node
+func getAllEsxiNodes() esxiNodes {
+	content, err := ioutil.ReadFile("../../hosts.toml")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var nodes esxiNodes
+	if _, err := toml.Decode(string(content), &nodes); err != nil {
+		log.Fatalln(err)
+	}
+	/* Debug
+	for key,value := range esxiNodes {
+		println(key, "=>", value.Name, value.Address, value.User)
+	} */
+
+	return nodes
+}
+
+// Get All VM Name and VM Id
+func getAllVmIdName() Machines {
+	allVm := Machines{}
+	for nodeName, nodeInfo := range getAllEsxiNodes() {
+		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		key, err := ssh.ParsePrivateKey(buf)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		// ssh connect
+		nodeAddr := nodeInfo.Address
+		nodePort := nodeInfo.Port
+		config := &ssh.ClientConfig{
+			User:            nodeInfo.User,
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+			Auth: []ssh.AuthMethod{
+				ssh.PublicKeys(key),
+			},
+		}
+		b, err := ExecCommandSsh(nodeAddr, nodePort, config, "vim-cmd vmsvc/getallvms")
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		// update vm list
+		for _, vm := range ParseResultAllVms(b) {
+			allVm = append(allVm, Machine{
+				Id: vm.Id,
+				Name: vm.Name,
+				NodeName: nodeName,
+			})
+		}
+	}
+	return allVm
 }

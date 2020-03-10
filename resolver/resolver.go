@@ -28,6 +28,7 @@ type QueryCaches []QueryCache
 // Resolve type 'A' record
 func ResolveRecordTypeA(fqdn string) string {
 	// cache hit
+	/*
 	if hasCache[fqdn] {
 		log.Printf("[CacheHit] %s\n", fqdn)
 		for _, vm := range cache {
@@ -37,6 +38,7 @@ func ResolveRecordTypeA(fqdn string) string {
 			}
 		}
 	}
+	*/
 
 	// ssh key
 	buf, err := ioutil.ReadFile("./old/id_rsa")
@@ -74,12 +76,14 @@ func ResolveRecordTypeA(fqdn string) string {
 			vmIp := GetVmIp(ip, port, config, vm.Id)
 
 			// add cache
+			/*
 			hasCache[fqdn] = true
 			cache = append(cache, QueryCache{
 				Fqdn:   fqdn,
 				IpAddr: vmIp,
 				Expire: time.Now(),
 			})
+			*/
 
 			// return "192.168.0.1"
 			return vmIp
