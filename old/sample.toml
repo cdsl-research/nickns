@@ -1,0 +1,11 @@
+[hostA]
+name = "Host A"
+address = "10.1.1.1"
+user = "root"
+identity_file = "../id_rsa"
+
+[hostB]
+name = "Host B"
+address = "10.1.1.2"
+user = "root"
+identity_file = "../id_rsa"
