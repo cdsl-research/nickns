@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	. "nickns/solver"
+
 	// "github.com/cybozu-go/well"
 	"github.com/miekg/dns"
 )
