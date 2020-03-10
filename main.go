@@ -288,16 +288,18 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 
 func main() {
 	// attach request handler func
-	dns.HandleFunc("local.", dnsRequestHandler)
+	domains := []string{"local."}
+	for _,domain := range domains {
+		dns.HandleFunc(domain, dnsRequestHandler)
+	}
 	dns.HandleFunc("arpa.", dnsRequestHandler)
 
-	// dns server
+	// bootstrapping dns server
 	port := 5300
 	server := &dns.Server{Addr: ":" + strconv.Itoa(port), Net: "udp"}
-	log.Printf("Starting at %d\n", port)
-	err := server.ListenAndServe()
-	defer server.Shutdown()
-	if err != nil {
+	log.Printf("NickNS Starting at %d/udp\n", port)
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to start server: %s\n ", err.Error())
 	}
+	defer server.Shutdown()
 }
