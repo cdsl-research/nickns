@@ -1,4 +1,4 @@
-package solver
+package resolver
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	. "nickns/solver/esxi"
+	. "nickns/resolver/esxi"
 
 	"golang.org/x/crypto/ssh"
 )

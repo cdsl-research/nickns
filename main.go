@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	. "nickns/solver"
+	. "nickns/resolver"
 
 	// "github.com/cybozu-go/well"
 	"github.com/miekg/dns"
