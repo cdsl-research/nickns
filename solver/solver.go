@@ -1,14 +1,13 @@
 package solver
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
+
+	. "nickns/solver/esxi"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -25,92 +24,6 @@ type QueryCache struct {
 	Expire time.Time
 }
 type QueryCaches []QueryCache
-
-// Get VM info from ESXi via SSH
-func execCommandSsh(ip string, port string, config *ssh.ClientConfig, command string) (bytes.Buffer, error) {
-	var buf bytes.Buffer
-
-	conn, err := ssh.Dial("tcp", ip+":"+port, config)
-	if err != nil {
-		return buf, err
-	}
-	defer conn.Close()
-
-	session, err := conn.NewSession()
-	if err != nil {
-		return buf, err
-	}
-	defer session.Close()
-
-	session.Stdout = &buf
-	if err := session.Run(command); err != nil {
-		return buf, err
-	}
-
-	return buf, nil
-}
-
-// Resolve VM ID to VM IPAddr
-func getVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string {
-	conn, err := ssh.Dial("tcp", ip+":"+port, config)
-	if err != nil {
-		log.Println(err.Error())
-		return ""
-	}
-	defer conn.Close()
-
-	session, err := conn.NewSession()
-	if err != nil {
-		log.Println(err.Error())
-		return ""
-	}
-	defer session.Close()
-
-	var buf bytes.Buffer
-	session.Stdout = &buf
-	// remoteCommand := "echo 192.168.100.100"
-	remoteCommand := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", vmid)
-	if err := session.Run(remoteCommand); err != nil {
-		log.Println(err.Error())
-		return ""
-	}
-	return strings.Replace(buf.String(), "\n", "", -1)
-}
-
-// For command result
-type Machine struct {
-	// VM ID on ESXi
-	Id int
-	// VM Name on ESXi
-	Name string
-}
-type Machines []Machine
-
-// Parse command result on SshGetAllVms()
-func parseResultAllVms(buf bytes.Buffer) Machines {
-	r := regexp.MustCompile(`^\d.+`)
-	var vms Machines
-	for {
-		st, err := buf.ReadString('\n')
-		if err != nil {
-			return vms
-		}
-
-		if !r.MatchString(st) {
-			continue
-		}
-
-		slice := strings.Split(st, "    ")
-		slice0, err := strconv.Atoi(slice[0])
-		if err != nil {
-			slice0 = -1
-		}
-		vms = append(vms, Machine{
-			Id:   slice0,
-			Name: strings.TrimSpace(slice[1]),
-		})
-	}
-}
 
 // Resolve type 'A' record
 func ResolveRecordTypeA(fqdn string) string {
@@ -148,17 +61,17 @@ func ResolveRecordTypeA(fqdn string) string {
 	}
 
 	// get vm list via ssh
-	b, err := execCommandSsh(ip, port, config, "vim-cmd vmsvc/getallvms") // test "cat /tmp/result"
+	b, err := ExecCommandSsh(ip, port, config, "vim-cmd vmsvc/getallvms") // test "cat /tmp/result"
 	if err != nil {
 		log.Println(err.Error())
 	}
 
 	// check a matched host in command result
-	for _, vm := range parseResultAllVms(b) {
+	for _, vm := range ParseResultAllVms(b) {
 		// debug:: println(vm.Name, "and", fqdn)
 		if vm.Name == strings.Split(fqdn, ".")[0] { // Hit
 			// resolve vmid to ip
-			vmIp := getVmIp(ip, port, config, vm.Id)
+			vmIp := GetVmIp(ip, port, config, vm.Id)
 
 			// add cache
 			hasCache[fqdn] = true
@@ -199,7 +112,7 @@ func ResolveRecordTypePTR(ptrAddr string) string {
 		},
 	}
 
-	b, err := execCommandSsh(ip, port, config, `
+	b, err := ExecCommandSsh(ip, port, config, `
 		for i in $(vim-cmd vmsvc/getallvms | awk '{print $1}' | grep [0-9]\\+)
 		do
 			vim-cmd vmsvc/get.summary $i | egrep "\s+(name|ipAddress)" | grep -o '".*"' \
