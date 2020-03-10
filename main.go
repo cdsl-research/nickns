@@ -223,7 +223,7 @@ func resolveRecordTypePTR(ptrAddr string) string {
 		slice := strings.Split(st, " ")
 		vmIp := slice[0]
 		vmFqdn := strings.Replace(slice[1],"\n", "", -1)
-    hasCache[vmFqdn+".local."] = true
+	    hasCache[vmFqdn+".local."] = true
 		cache = append(cache, QueryCache{
 			Fqdn: vmFqdn,
 			IpAddr: vmIp,
@@ -243,44 +243,37 @@ func resolveRecordTypePTR(ptrAddr string) string {
 	return foundAnswer + ".local" + "."
 }
 
-// Parse request query by record type
-func parseQuery(m *dns.Msg) {
-	for _, q := range m.Question {
-		switch q.Qtype {
-		case dns.TypeA:
-			ip := resolveRecordTypeA(q.Name)
-			if ip != "" {
-				log.Printf("[QueryHit] %s => %s\n", q.Name, ip)
-				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
-				if err == nil {
-					m.Answer = append(m.Answer, rr)
-				}
-			} else {
-				log.Printf("[QueryUnHit] %s\n", q.Name)
-			}
-		case dns.TypePTR:
-			fqdn := resolveRecordTypePTR(q.Name)
-			if fqdn != "" {
-				log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
-				rr, err := dns.NewRR(fmt.Sprintf("%s PTR %s", q.Name, fqdn))
-				if err == nil {
-					m.Answer = append(m.Answer, rr)
-				}
-			} else {
-				log.Printf("[QueryUnHit] %s\n", q.Name)
-			}
-		}
-	}
-}
-
 func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(r)
 	m.Compress = false
 
-	switch r.Opcode {
-	case dns.OpcodeQuery:
-		parseQuery(m)
+	// parse query
+	if r.Opcode == dns.OpcodeQuery {
+		for _, q := range m.Question {
+			switch q.Qtype {
+			case dns.TypeA:
+				if ip := resolveRecordTypeA(q.Name); ip != "" {
+					log.Printf("[QueryHit] %s => %s\n", q.Name, ip)
+					rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
+					if err == nil {
+						m.Answer = append(m.Answer, rr)
+					}
+				} else {
+					log.Printf("[QueryUnHit] %s\n", q.Name)
+				}
+			case dns.TypePTR:
+				if fqdn := resolveRecordTypePTR(q.Name); fqdn != "" {
+					log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
+					rr, err := dns.NewRR(fmt.Sprintf("%s PTR %s", q.Name, fqdn))
+					if err == nil {
+						m.Answer = append(m.Answer, rr)
+					}
+				} else {
+					log.Printf("[QueryUnHit] %s\n", q.Name)
+				}
+			}
+		}
 	}
 
 	w.WriteMsg(m)
