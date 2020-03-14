@@ -3,16 +3,26 @@
   <component name="ChangeListManager">
     <list default="true" id="b31af6d8-b028-43c3-a1ea-4255e0e874bf" name="Default Changelist" comment="add PTR Record support">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resolver/esxi/esxi.go" beforeDir="false" afterPath="$PROJECT_DIR$/resolver/esxi/esxi.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
   <component name="GOROOT" path="/usr/local/Cellar/go/1.12.7/libexec" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1YSxDipgvhdbNxKVStm96vO6Ntl" />
   <component name="ProjectViewState">
@@ -22,14 +32,24 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="GO_FMT" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="go.tried.to.enable.integration.dep.integrator" value="true" />
+    <property name="go.vendoring.notification.had.been.shown" value="true" />
+    <property name="jdk.selected.JAVA_MODULE" value="1.8" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/solver" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -69,6 +89,7 @@
       <option name="presentableId" value="Default" />
       <updated>1582949678885</updated>
       <workItem from="1582949687106" duration="9867000" />
+      <workItem from="1583820461681" duration="21000000" />
     </task>
     <task id="LOCAL-00001" summary="add idea files">
       <created>1582950204403</created>
@@ -98,7 +119,14 @@
       <option name="project" value="LOCAL" />
       <updated>1582958536062</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="GetVmIp()を切り替え">
+      <created>1584177351147</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1584177351147</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,7 +137,8 @@
     <MESSAGE value="fixed a little" />
     <MESSAGE value="add comments" />
     <MESSAGE value="add PTR Record support" />
-    <option name="LAST_COMMIT_MESSAGE" value="add PTR Record support" />
+    <MESSAGE value="GetVmIp()を切り替え" />
+    <option name="LAST_COMMIT_MESSAGE" value="GetVmIp()を切り替え" />
   </component>
   <component name="WindowStateProjectService">
     <state x="463" y="202" key="#GOROOT" timestamp="1582949757208">
@@ -120,10 +149,10 @@
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="327" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1582955736930" />
-    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1582958620641">
+    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1584177576056">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1582958620641" />
+    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1584177576056" />
     <state width="1592" height="280" key="GridCell.Tab.0.bottom" timestamp="1582969153292">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
@@ -144,5 +173,25 @@
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="463" y="276" key="Vcs.Push.Dialog.v2/0.23.1680.1027@0.23.1680.1027" timestamp="1582958628093" />
+    <state x="409" y="154" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1583841794740">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="409" y="154" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.23.1680.1027@0.23.1680.1027" timestamp="1583841794740" />
+    <state x="619" y="460" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583821690011">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="619" y="460" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.23.1680.1027@0.23.1680.1027" timestamp="1583821690011" />
+    <state x="213" y="159" key="new project wizard" timestamp="1583845427157">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="213" y="159" key="new project wizard/0.23.1680.1027@0.23.1680.1027" timestamp="1583845427157" />
+    <state x="501" y="248" width="670" height="675" key="run.anything.popup" timestamp="1583844970726">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="501" y="248" width="670" height="675" key="run.anything.popup/0.23.1680.1027@0.23.1680.1027" timestamp="1583844970726" />
+    <state x="501" y="250" width="670" height="676" key="search.everywhere.popup" timestamp="1584170087695">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="501" y="250" width="670" height="676" key="search.everywhere.popup/0.23.1680.1027@0.23.1680.1027" timestamp="1584170087695" />
   </component>
 </project>
