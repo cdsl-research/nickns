@@ -26,6 +26,7 @@ jobs:
       - name: Get dependencies
         run: |
           sudo apt install go-dep -y
+          mkdir -p $HOME/go/src/
           ln -s $PWD $HOME/go/src/
           cd $HOME/go/src/nickns
           dep ensure
