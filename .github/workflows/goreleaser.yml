@@ -29,12 +29,15 @@ jobs:
       - name: Create Symbolic Link
         run: ln -s $PWD $HOME/go/src/
 
-      - name: Dep ensure
-        working-directory: $HOME/go/src/nickns
-        run: $HOME/go/bin/dep ensure
+      - name: Debug
+        run: find $HOME
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v1
+
+      - name: Dep ensure
+        working-directory: $HOME/go/src/nickns
+        run: $HOME/go/bin/dep ensure
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v1
