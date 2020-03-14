@@ -30,7 +30,7 @@ type esxiNode struct {
 type esxiNodes map[string]esxiNode
 
 // Get SSH Nodes from hosts.toml
-func getAllEsxiNodes() esxiNodes {
+func loadAllEsxiNodes() esxiNodes {
 	content, err := ioutil.ReadFile("hosts.toml")
 	if err != nil {
 		log.Fatalln(err)
@@ -49,7 +49,7 @@ func getAllEsxiNodes() esxiNodes {
 }
 
 // Parse command result
-func ParseResultAllVms(buf bytes.Buffer) Machines {
+func parseResultAllVms(buf bytes.Buffer) Machines {
 	r := regexp.MustCompile(`^\d.+`)
 	var vms Machines
 	for {
@@ -74,7 +74,7 @@ func ParseResultAllVms(buf bytes.Buffer) Machines {
 }
 
 // Get VM info from ESXi via SSH
-func ExecCommandSsh(ip string, port string, config *ssh.ClientConfig, command string) (bytes.Buffer, error) {
+func execCommandSsh(ip string, port string, config *ssh.ClientConfig, command string) (bytes.Buffer, error) {
 	var buf bytes.Buffer
 
 	conn, err := ssh.Dial("tcp", ip+":"+port, config)
@@ -99,7 +99,7 @@ func ExecCommandSsh(ip string, port string, config *ssh.ClientConfig, command st
 
 // Get a Machine's IP
 func GetVmIp(machine Machine) string {
-	nodes := getAllEsxiNodes()
+	nodes := loadAllEsxiNodes()
 	node := nodes[machine.NodeName]
 
 	buf, err := ioutil.ReadFile(node.IdentityFile)
@@ -147,7 +147,7 @@ func GetVmIp(machine Machine) string {
 // Get All VM Name and VM Id
 func GetAllVmIdName() Machines {
 	allVm := Machines{}
-	for nodeName, nodeInfo := range getAllEsxiNodes() {
+	for nodeName, nodeInfo := range loadAllEsxiNodes() {
 		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
 		if err != nil {
 			log.Fatalln(err)
@@ -167,13 +167,13 @@ func GetAllVmIdName() Machines {
 				ssh.PublicKeys(key),
 			},
 		}
-		b, err := ExecCommandSsh(nodeAddr, nodePort, config, "vim-cmd vmsvc/getallvms")
+		b, err := execCommandSsh(nodeAddr, nodePort, config, "vim-cmd vmsvc/getallvms")
 		if err != nil {
 			log.Println(err.Error())
 		}
 
 		// update vm list
-		for _, vm := range ParseResultAllVms(b) {
+		for _, vm := range parseResultAllVms(b) {
 			allVm = append(allVm, Machine{
 				Id:       vm.Id,
 				Name:     vm.Name,
@@ -185,7 +185,7 @@ func GetAllVmIdName() Machines {
 }
 
 func GetVmIpName(ipAddr string) string {
-	for _, nodeInfo := range getAllEsxiNodes() {
+	for _, nodeInfo := range loadAllEsxiNodes() {
 		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
 		if err != nil {
 			log.Fatalln(err)
@@ -205,7 +205,7 @@ func GetVmIpName(ipAddr string) string {
 				ssh.PublicKeys(key),
 			},
 		}
-		b, err := ExecCommandSsh(nodeAddr, nodePort, config, `
+		b, err := execCommandSsh(nodeAddr, nodePort, config, `
 			for i in $(vim-cmd vmsvc/getallvms | awk '{print $1}' | grep [0-9]\\+)
 			do
 				vim-cmd vmsvc/get.summary $i | egrep "\s+(name|ipAddress)" | grep -o '".*"' \
