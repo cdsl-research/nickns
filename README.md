@@ -1,12 +1,55 @@
 # NickNS
 
-![](https://github.com/cdsl-research/nickns/workflows/build/badge.svg)
-
-NickNS is a DNS Server for ESXi Resources
+NickNS is DNS Server. This server resolve VM Name into IP Address on VMware ESXi.
 
 <img src="https://raw.githubusercontent.com/cdsl-research/nickns/master/overview.png" width=600>
 
-## Develop
+## Installation
+
+### go get
+
+```
+go get github.com/x-motemen/ghq
+```
+
+## Usage
+
+### [1] Edit Config files
+
+Set ESXi Host on **hosts.toml**.
+
+```
+[host A]
+address = "esxi.koya.priv"
+port = "22"
+user = "root"
+identity_file = "old/id_rsa"
+
+[host B]
+address = "esxi.koya.priv"
+port = "22"
+user = "root"
+identity_file = "old/id_rsa"
+```
+
+Set NickNS running options on **config.toml**.
+
+```
+port = 5310
+domains = ["local.", "example.com."]
+ttl = 3600
+```
+
+### [2] start server
+
+```
+$ nickns
+2020/03/14 21:40:25 NickNS Starting at 5310/udp
+2020/03/14 21:40:27 [QueryHit] elastic5.local. => 192.168.0.36
+2020/03/14 21:40:30 [QueryHit] elastic5.example.com. => 192.168.0.36
+```
+
+## For Develop
 
 Build local ssh server
 
@@ -45,4 +88,3 @@ Server Log
 2020/02/29 18:47:52 [QueryHit] 35.0.168.192.in-addr.arpa. => unbound.local.
 ```
 
-ref: https://gist.github.com/walm/0d67b4fb2d5daf3edd4fad3e13b162cb
