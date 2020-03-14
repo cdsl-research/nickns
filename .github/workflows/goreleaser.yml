@@ -27,10 +27,7 @@ jobs:
         run: go get -u -v github.com/golang/dep/cmd/dep
 
       - name: Dep ensure
-        run: |
-          ln -s $PWD $HOME/go/src/
-          cd $HOME/go/src/nickns
-          $HOME/go/bin/dep ensure
+        run: ln -s $PWD $HOME/go/src/ && cd $HOME/go/src/nickns && $HOME/go/bin/dep ensure
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v1
