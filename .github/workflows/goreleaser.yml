@@ -29,10 +29,8 @@ jobs:
       - name: Create Symbolic Link
         run: ln -s $PWD $HOME/go/src/
 
-      - name: Change Dir
-        run: cd $HOME/go/src/nickns
-
       - name: Dep ensure
+        working-directory: $HOME/go/src/nickns
         run: $HOME/go/bin/dep ensure
 
       - name: Setup tmate session
