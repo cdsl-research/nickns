@@ -9,10 +9,34 @@ NickNS is DNS Server. This server resolve VM Name into IP Address on VMware ESXi
 ### go get
 
 ```
-go get github.com/x-motemen/ghq
+$ go get github.com/x-motemen/ghq
 ```
 
 ## Usage
+
+### [0] Enable SSH on ESXi
+
+Generate SSH Key on laptop.
+
+```
+$ ssh-keygen -t rsa -b 4096
+```
+
+Copy SSH key from from laptop to ESXi.
+
+```
+$ sftp root@esxi.example.com
+Connected to root@esxi.example.com.
+sftp> puts /path/to/id_rsa.pub /etc/ssh/keys-root/authorized_keys
+```
+
+Test Connecting to SSH on Terminal.
+
+```
+$ ssh -i /path/to/id_rsa root@esxi.example.com
+```
+
+See also: https://kb.vmware.com/s/article/1002866
 
 ### [1] Edit Config files
 
@@ -20,16 +44,16 @@ Set ESXi Host on **hosts.toml**.
 
 ```
 [host A]
-address = "esxi.koya.priv"
+address = "esxi.example.com"
 port = "22"
 user = "root"
-identity_file = "old/id_rsa"
+identity_file = "/path/to/id_rsa"
 
 [host B]
-address = "esxi.koya.priv"
+address = "esxi.example.com"
 port = "22"
 user = "root"
-identity_file = "old/id_rsa"
+identity_file = "~/path/to/id_rsa"
 ```
 
 Set NickNS running options on **config.toml**.
