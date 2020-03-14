@@ -183,3 +183,53 @@ func GetAllVmIdName() Machines {
 	}
 	return allVm
 }
+
+func GetVmIpName(ipAddr string) string {
+	for _, nodeInfo := range getAllEsxiNodes() {
+		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		key, err := ssh.ParsePrivateKey(buf)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		// ssh connect
+		nodeAddr := nodeInfo.Address
+		nodePort := nodeInfo.Port
+		config := &ssh.ClientConfig{
+			User:            nodeInfo.User,
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+			Auth: []ssh.AuthMethod{
+				ssh.PublicKeys(key),
+			},
+		}
+		b, err := ExecCommandSsh(nodeAddr, nodePort, config, `
+			for i in $(vim-cmd vmsvc/getallvms | awk '{print $1}' | grep [0-9]\\+)
+			do
+				vim-cmd vmsvc/get.summary $i | egrep "\s+(name|ipAddress)" | grep -o '".*"' \
+				| sed -e ':a;N;$!ba;s/\n/ /g;s/"//g' | grep [0-9\.]\\{7,\\} &
+			done
+		`)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		// parse ssh result
+		for {
+			st, err := b.ReadString('\n')
+			if err != nil {
+				break
+			}
+
+			slice := strings.Split(st, " ")
+			vmIp := slice[0]
+			vmName := strings.Replace(slice[1], "\n", "", -1)
+			if ipAddr == vmIp {
+				return vmName // todo replace ' ' and '_'
+			}
+		}
+	}
+	return ""
+}

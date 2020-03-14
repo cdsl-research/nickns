@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b31af6d8-b028-43c3-a1ea-4255e0e874bf" name="Default Changelist" comment="add PTR Record support">
+    <list default="true" id="b31af6d8-b028-43c3-a1ea-4255e0e874bf" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resolver/esxi/esxi.go" beforeDir="false" afterPath="$PROJECT_DIR$/resolver/esxi/esxi.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resolver/resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/resolver/resolver.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +91,7 @@
       <option name="presentableId" value="Default" />
       <updated>1582949678885</updated>
       <workItem from="1582949687106" duration="9867000" />
-      <workItem from="1583820461681" duration="21000000" />
+      <workItem from="1583820461681" duration="22806000" />
     </task>
     <task id="LOCAL-00001" summary="add idea files">
       <created>1582950204403</created>
@@ -126,7 +128,21 @@
       <option name="project" value="LOCAL" />
       <updated>1584177351147</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="refactoring">
+      <created>1584177576415</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1584177576415</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update idea conf">
+      <created>1584177594215</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1584177594215</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,7 +154,9 @@
     <MESSAGE value="add comments" />
     <MESSAGE value="add PTR Record support" />
     <MESSAGE value="GetVmIp()を切り替え" />
-    <option name="LAST_COMMIT_MESSAGE" value="GetVmIp()を切り替え" />
+    <MESSAGE value="refactoring" />
+    <MESSAGE value="update idea conf" />
+    <option name="LAST_COMMIT_MESSAGE" value="update idea conf" />
   </component>
   <component name="WindowStateProjectService">
     <state x="463" y="202" key="#GOROOT" timestamp="1582949757208">
@@ -149,10 +167,10 @@
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="327" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1582955736930" />
-    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1584177576056">
+    <state x="446" y="127" key="CommitChangelistDialog2" timestamp="1584177593705">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1584177576056" />
+    <state x="446" y="127" key="CommitChangelistDialog2/0.23.1680.1027@0.23.1680.1027" timestamp="1584177593705" />
     <state width="1592" height="280" key="GridCell.Tab.0.bottom" timestamp="1582969153292">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
@@ -185,10 +203,10 @@
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="213" y="159" key="new project wizard/0.23.1680.1027@0.23.1680.1027" timestamp="1583845427157" />
-    <state x="501" y="248" width="670" height="675" key="run.anything.popup" timestamp="1583844970726">
+    <state x="501" y="248" width="670" height="675" key="run.anything.popup" timestamp="1584178521255">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state x="501" y="248" width="670" height="675" key="run.anything.popup/0.23.1680.1027@0.23.1680.1027" timestamp="1583844970726" />
+    <state x="501" y="248" width="670" height="675" key="run.anything.popup/0.23.1680.1027@0.23.1680.1027" timestamp="1584178521255" />
     <state x="501" y="250" width="670" height="676" key="search.everywhere.popup" timestamp="1584170087695">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>

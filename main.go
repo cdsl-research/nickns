@@ -14,11 +14,11 @@ import (
 )
 
 var Port = 5300
-var Domains = []string{"local."}
+var Domains = []string{"local.", "a910.tak-cslab.org"}
 
 func stripDomainName(fqdn string) string {
-	for _,domain := range Domains {
-		r := regexp.MustCompile("^[0-9a-zA-Z_\\-]+."+domain+"$")
+	for _, domain := range Domains {
+		r := regexp.MustCompile("^[0-9a-zA-Z_\\-]+." + domain + "$")
 		if r.MatchString(fqdn) {
 			// log.Println(strings.Replace(fqdn, domain, "", -1))
 			return strings.Replace(fqdn, "."+domain, "", -1)
@@ -48,11 +48,14 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 					log.Printf("[QueryUnHit] %s\n", q.Name)
 				}
 			case dns.TypePTR:
-				if fqdn := ResolveRecordTypePTR(q.Name); fqdn != "" {
-					log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
-					rr, err := dns.NewRR(fmt.Sprintf("%s PTR %s", q.Name, fqdn))
-					if err == nil {
-						m.Answer = append(m.Answer, rr)
+				if hostname := ResolveRecordTypePTR(q.Name); hostname != "" {
+					for _, domain := range Domains {
+						fqdn := hostname + "." + domain
+						log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
+						rr, err := dns.NewRR(fmt.Sprintf("%s PTR %s", q.Name, fqdn))
+						if err == nil {
+							m.Answer = append(m.Answer, rr)
+						}
 					}
 				} else {
 					log.Printf("[QueryUnHit] %s\n", q.Name)
@@ -66,7 +69,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 
 func main() {
 	// attach request handler func
-	for _,domain := range Domains {
+	for _, domain := range Domains {
 		dns.HandleFunc(domain, dnsRequestHandler)
 	}
 	dns.HandleFunc("arpa.", dnsRequestHandler)
