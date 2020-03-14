@@ -30,7 +30,7 @@ Connected to root@esxi.example.com.
 sftp> puts /path/to/id_rsa.pub /etc/ssh/keys-root/authorized_keys
 ```
 
-Test Connecting to SSH on Terminal.
+Try to connect SSH on Terminal.
 
 ```
 $ ssh -i /path/to/id_rsa root@esxi.example.com
