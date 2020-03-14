@@ -23,11 +23,11 @@ jobs:
       - name: Unshallow
         run: git fetch --prune --unshallow
 
-      - name: Get dependencies
+      - name: Add dep
+        run: go get -u -v github.com/golang/dep/cmd/dep
+
+      - name: Dep ensure
         run: |
-          # sudo apt install go-dep -y
-          # mkdir -p $HOME/go/src/
-          go get -u -v github.com/golang/dep/cmd/dep
           ln -s $PWD $HOME/go/src/
           cd $HOME/go/src/nickns
           $HOME/go/bin/dep ensure
