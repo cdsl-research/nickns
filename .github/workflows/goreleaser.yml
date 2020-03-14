@@ -9,33 +9,26 @@ on:
 jobs:
   goreleaser:
     name: Go Releaser
+    env:
+      GOPATH: ${{ github.workspace }}
+      GO111MODULE: off
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go
+      - name: Install Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.13
-        id: go
+          go-version: 1.14
 
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v2
         with:
-          path: $HOME/go/src/
-
-      - name: Unshallow
-        run: git fetch --prune --unshallow
+          path: ./src/github.com/${{ github.repository }}
 
       - name: Add dep
         run: go get -u -v github.com/golang/dep/cmd/dep
 
-      - name: Create Symbolic Link
-        run: ln -s $PWD $HOME/go/src/
-
-      - name: Debug
-        run: find $HOME
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v1
+      #- name: Setup tmate session
+      #  uses: mxschmitt/action-tmate@v1
 
       - name: Dep ensure
         working-directory: $HOME/go/src/nickns
