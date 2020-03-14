@@ -23,12 +23,16 @@ jobs:
       - name: Unshallow
         run: git fetch --prune --unshallow
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v1
+
       - name: Get dependencies
         run: |
           if [ -f Gopkg.toml ]; then
               go get -v -t github.com/golang/dep/cmd/dep
-              dep ensure
+              $GOPATHdep ensure
           fi
+
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v1
