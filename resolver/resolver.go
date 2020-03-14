@@ -29,20 +29,20 @@ type QueryCaches []QueryCache
 func ResolveRecordTypeA(hostname string) string {
 	// cache hit
 	/*
-	if hasCache[fqdn] {
-		log.Printf("[CacheHit] %s\n", fqdn)
-		for _, vm := range cache {
-			// todo: check cache-expire -> del cache from set and array
-			if vm.Fqdn == strings.Split(fqdn, ".")[0] {
-				return vm.IpAddr
+		if hasCache[fqdn] {
+			log.Printf("[CacheHit] %s\n", fqdn)
+			for _, vm := range cache {
+				// todo: check cache-expire -> del cache from set and array
+				if vm.Fqdn == strings.Split(fqdn, ".")[0] {
+					return vm.IpAddr
+				}
 			}
 		}
-	}
 	*/
-	for _,vm := range GetAllVmIdName() {
+	for _, vm := range GetAllVmIdName() {
 		// log.Println(vm.Name, fqdn)
 		if vm.Name == hostname {
-			return GetVmIp2(vm)
+			return GetVmIp(vm)
 		}
 	}
 	return "" // UnHit
@@ -93,10 +93,10 @@ func ResolveRecordTypePTR(ptrAddr string) string {
 
 		slice := strings.Split(st, " ")
 		vmIp := slice[0]
-		vmFqdn := strings.Replace(slice[1],"\n", "", -1)
+		vmFqdn := strings.Replace(slice[1], "\n", "", -1)
 		hasCache[vmFqdn+".local."] = true
 		cache = append(cache, QueryCache{
-			Fqdn: vmFqdn,
+			Fqdn:   vmFqdn,
 			IpAddr: vmIp,
 			Expire: time.Now(),
 		})

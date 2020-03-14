@@ -14,17 +14,17 @@ import (
 )
 
 type Machine struct {
-	Id int // VM ID on ESXi
-	Name string // VM Name on ESXi
+	Id       int    // VM ID on ESXi
+	Name     string // VM Name on ESXi
 	NodeName string // ESXi Node Name
 }
 type Machines []Machine
 
 type esxiNode struct {
-	Name string
-	Address string
-	Port string
-	User string
+	Name         string
+	Address      string
+	Port         string
+	User         string
 	IdentityFile string `toml:"identity_file"`
 }
 type esxiNodes map[string]esxiNode
@@ -79,35 +79,8 @@ func ExecCommandSsh(ip string, port string, config *ssh.ClientConfig, command st
 	return buf, nil
 }
 
-// Resolve VM ID to VM IPAddr
-func GetVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string {
-	conn, err := ssh.Dial("tcp", ip+":"+port, config)
-	if err != nil {
-		log.Println(err.Error())
-		return ""
-	}
-	defer conn.Close()
-
-	session, err := conn.NewSession()
-	if err != nil {
-		log.Println(err.Error())
-		return ""
-	}
-	defer session.Close()
-
-	var buf bytes.Buffer
-	session.Stdout = &buf
-	// remoteCommand := "echo 192.168.100.100"
-	remoteCommand := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", vmid)
-	if err := session.Run(remoteCommand); err != nil {
-		log.Println(err.Error())
-		return ""
-	}
-	return strings.Replace(buf.String(), "\n", "", -1)
-}
-
 // Temporally
-func GetVmIp2(machine Machine) string {
+func GetVmIp(machine Machine) string {
 	nodes := getAllEsxiNodes()
 	node := nodes[machine.NodeName]
 
@@ -152,7 +125,6 @@ func GetVmIp2(machine Machine) string {
 	}
 	return strings.Replace(sshBuf.String(), "\n", "", -1)
 }
-
 
 // Get SSH Info into ESXi Node
 func getAllEsxiNodes() esxiNodes {
@@ -204,8 +176,8 @@ func GetAllVmIdName() Machines {
 		// update vm list
 		for _, vm := range ParseResultAllVms(b) {
 			allVm = append(allVm, Machine{
-				Id: vm.Id,
-				Name: vm.Name,
+				Id:       vm.Id,
+				Name:     vm.Name,
 				NodeName: nodeName,
 			})
 		}
