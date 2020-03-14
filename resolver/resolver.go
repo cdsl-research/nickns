@@ -39,54 +39,10 @@ func ResolveRecordTypeA(hostname string) string {
 		}
 	}
 	*/
-
-	// ssh key
-	buf, err := ioutil.ReadFile("./old/id_rsa")
-	if err != nil {
-		panic(err)
-	}
-	key, err := ssh.ParsePrivateKey(buf)
-	if err != nil {
-		panic(err)
-	}
-
-	// ssh connect
-	ip := "192.168.0.20"
-	port := "22"
-	user := "root"
-	config := &ssh.ClientConfig{
-		User:            user,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Auth: []ssh.AuthMethod{
-			ssh.PublicKeys(key),
-		},
-	}
-
-	// get vm list via ssh
-	b, err := ExecCommandSsh(ip, port, config, "vim-cmd vmsvc/getallvms") // test "cat /tmp/result"
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	// check a matched host in command result
-	for _, vm := range ParseResultAllVms(b) {
-		// debug:: println(vm.Name, "and", fqdn)
-		if vm.Name == strings.Split(fqdn, ".")[0] { // Hit
-			// resolve vmid to ip
-			vmIp := GetVmIp(ip, port, config, vm.Id)
-
-			// add cache
-			/*
-			hasCache[fqdn] = true
-			cache = append(cache, QueryCache{
-				Fqdn:   fqdn,
-				IpAddr: vmIp,
-				Expire: time.Now(),
-			})
-			*/
-
-			// return "192.168.0.1"
-			return vmIp
+	for _,vm := range GetAllVmIdName() {
+		// log.Println(vm.Name, fqdn)
+		if vm.Name == hostname {
+			return GetVmIp2(vm)
 		}
 	}
 	return "" // UnHit

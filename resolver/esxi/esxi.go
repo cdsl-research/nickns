@@ -106,9 +106,57 @@ func GetVmIp(ip string, port string, config *ssh.ClientConfig, vmid int) string 
 	return strings.Replace(buf.String(), "\n", "", -1)
 }
 
+// Temporally
+func GetVmIp2(machine Machine) string {
+	nodes := getAllEsxiNodes()
+	node := nodes[machine.NodeName]
+
+	buf, err := ioutil.ReadFile(node.IdentityFile)
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	key, err := ssh.ParsePrivateKey(buf)
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	config := &ssh.ClientConfig{
+		User:            node.User,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeys(key),
+		},
+	}
+
+	conn, err := ssh.Dial("tcp", node.Address+":"+node.Port, config)
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	defer conn.Close()
+
+	session, err := conn.NewSession()
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	defer session.Close()
+
+	var sshBuf bytes.Buffer
+	session.Stdout = &sshBuf
+	remoteCommand := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", machine.Id)
+	if err := session.Run(remoteCommand); err != nil {
+		log.Println(err)
+		return ""
+	}
+	return strings.Replace(sshBuf.String(), "\n", "", -1)
+}
+
+
 // Get SSH Info into ESXi Node
 func getAllEsxiNodes() esxiNodes {
-	content, err := ioutil.ReadFile("../../hosts.toml")
+	content, err := ioutil.ReadFile("hosts.toml")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -126,7 +174,7 @@ func getAllEsxiNodes() esxiNodes {
 }
 
 // Get All VM Name and VM Id
-func getAllVmIdName() Machines {
+func GetAllVmIdName() Machines {
 	allVm := Machines{}
 	for nodeName, nodeInfo := range getAllEsxiNodes() {
 		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
