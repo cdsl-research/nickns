@@ -29,7 +29,26 @@ type esxiNode struct {
 }
 type esxiNodes map[string]esxiNode
 
-// Parse command result on SshGetAllVms()
+// Get SSH Nodes from hosts.toml
+func getAllEsxiNodes() esxiNodes {
+	content, err := ioutil.ReadFile("hosts.toml")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var nodes esxiNodes
+	if _, err := toml.Decode(string(content), &nodes); err != nil {
+		log.Fatalln(err)
+	}
+	/* Debug
+	for key,value := range esxiNodes {
+		println(key, "=>", value.Name, value.Address, value.User)
+	} */
+
+	return nodes
+}
+
+// Parse command result
 func ParseResultAllVms(buf bytes.Buffer) Machines {
 	r := regexp.MustCompile(`^\d.+`)
 	var vms Machines
@@ -38,7 +57,6 @@ func ParseResultAllVms(buf bytes.Buffer) Machines {
 		if err != nil {
 			return vms
 		}
-
 		if !r.MatchString(st) {
 			continue
 		}
@@ -79,7 +97,7 @@ func ExecCommandSsh(ip string, port string, config *ssh.ClientConfig, command st
 	return buf, nil
 }
 
-// Temporally
+// Get a Machine's IP
 func GetVmIp(machine Machine) string {
 	nodes := getAllEsxiNodes()
 	node := nodes[machine.NodeName]
@@ -124,25 +142,6 @@ func GetVmIp(machine Machine) string {
 		return ""
 	}
 	return strings.Replace(sshBuf.String(), "\n", "", -1)
-}
-
-// Get SSH Info into ESXi Node
-func getAllEsxiNodes() esxiNodes {
-	content, err := ioutil.ReadFile("hosts.toml")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	var nodes esxiNodes
-	if _, err := toml.Decode(string(content), &nodes); err != nil {
-		log.Fatalln(err)
-	}
-	/* Debug
-	for key,value := range esxiNodes {
-		println(key, "=>", value.Name, value.Address, value.User)
-	} */
-
-	return nodes
 }
 
 // Get All VM Name and VM Id
