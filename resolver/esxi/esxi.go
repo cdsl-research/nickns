@@ -21,7 +21,6 @@ type Machine struct {
 type Machines []Machine
 
 type esxiNode struct {
-	Name         string
 	Address      string
 	Port         string
 	User         string
