@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -22,7 +21,6 @@ type Machine struct {
 type Machines []Machine
 
 func parser() {
-	File Open
 	file, err := os.Open(`./raw`)
 	if err != nil {
 		log.Fatal("Could not open file: ", err.Error())

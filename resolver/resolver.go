@@ -26,7 +26,7 @@ type QueryCache struct {
 type QueryCaches []QueryCache
 
 // Resolve type 'A' record
-func ResolveRecordTypeA(fqdn string) string {
+func ResolveRecordTypeA(hostname string) string {
 	// cache hit
 	/*
 	if hasCache[fqdn] {
