@@ -1,0 +1,13 @@
+[hostA]
+name = "ESXi 1"
+address = "esxi.koya.priv"
+port = "22"
+user = "root"
+identity_file = "old/id_rsa"
+
+[hostB]
+name = "ESXi 2"
+address = "esxi.koya.priv"
+port = "22"
+user = "root"
+identity_file = "old/id_rsa"
