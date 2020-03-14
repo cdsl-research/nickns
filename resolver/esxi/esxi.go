@@ -212,22 +212,23 @@ func GetVmIpName(ipAddr string) string {
 				| sed -e ':a;N;$!ba;s/\n/ /g;s/"//g' | grep [0-9\.]\\{7,\\} &
 			done
 		`)
+		// println(b.String())
 		if err != nil {
 			log.Println(err.Error())
 		}
 
 		// parse ssh result
 		for {
-			st, err := b.ReadString('\n')
+			var st, err = b.ReadString('\n')
 			if err != nil {
 				break
 			}
 
 			slice := strings.Split(st, " ")
 			vmIp := slice[0]
-			vmName := strings.Replace(slice[1], "\n", "", -1)
+			vmName := strings.ReplaceAll(strings.Join(slice[1:], "-"), "\n", "")
 			if ipAddr == vmIp {
-				return vmName // todo replace ' ' and '_'
+				return vmName
 			}
 		}
 	}

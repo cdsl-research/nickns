@@ -14,6 +14,7 @@ import (
 )
 
 var Port = 5300
+var TTL = 600
 var Domains = []string{"local.", "a910.tak-cslab.org."}
 
 func stripDomainName(fqdn string) string {
@@ -40,7 +41,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 				hostname := stripDomainName(q.Name)
 				if ip := ResolveRecordTypeA(hostname); ip != "" {
 					log.Printf("[QueryHit] %s => %s\n", q.Name, ip)
-					rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
+					rr, err := dns.NewRR(fmt.Sprintf("%s %d IN A %s", q.Name, TTL, ip))
 					if err == nil {
 						m.Answer = append(m.Answer, rr)
 					}
@@ -52,7 +53,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 					for _, domain := range Domains {
 						fqdn := hostname + "." + domain
 						log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
-						rr, err := dns.NewRR(fmt.Sprintf("%s PTR %s", q.Name, fqdn))
+						rr, err := dns.NewRR(fmt.Sprintf("%s %d IN PTR %s", q.Name, TTL, fqdn))
 						if err == nil {
 							m.Answer = append(m.Answer, rr)
 						}
@@ -75,9 +76,8 @@ func main() {
 	dns.HandleFunc("arpa.", dnsRequestHandler)
 
 	// bootstrapping dns server
-	port := 5300
 	server := &dns.Server{Addr: ":" + strconv.Itoa(Port), Net: "udp"}
-	log.Printf("NickNS Starting at %d/udp\n", port)
+	log.Printf("NickNS Starting at %d/udp\n", Port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to start server: %s\n ", err.Error())
 	}
