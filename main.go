@@ -14,7 +14,7 @@ import (
 )
 
 var Port = 5300
-var Domains = []string{"local.", "a910.tak-cslab.org"}
+var Domains = []string{"local.", "a910.tak-cslab.org."}
 
 func stripDomainName(fqdn string) string {
 	for _, domain := range Domains {
