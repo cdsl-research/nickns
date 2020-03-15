@@ -27,6 +27,7 @@ jobs:
         working-directory: go/src/github.com/${{ github.repository }}
 
       - name: Run GoReleaser
+        working-directory: go/src/github.com/${{ github.repository }}
         uses: goreleaser/goreleaser-action@v1
         with:
           version: latest
