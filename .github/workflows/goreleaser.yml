@@ -36,6 +36,7 @@ jobs:
           version: latest
           args: release --rm-dist
           key: ${{ secrets.YOUR_PRIVATE_KEY }}
-          workdir: ./go/src/github.com/${{ github.repository }}/
+          # workdir: go/src/github.com/${{ github.repository }}/
+          workdir: ${{ github.workspace }}/go/src/github.com/${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
