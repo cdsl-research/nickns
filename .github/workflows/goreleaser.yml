@@ -31,6 +31,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v1
         with:
+          workdir: go/src/github.com/${{ github.repository }}
           version: latest
           args: release --rm-dist
           key: ${{ secrets.YOUR_PRIVATE_KEY }}
