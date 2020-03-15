@@ -26,8 +26,9 @@ jobs:
       - run: $GOPATH/bin/dep ensure
         working-directory: go/src/github.com/${{ github.repository }}
 
+      - run: pwd
+
       - name: Run GoReleaser
-        working-directory: go/src/github.com/${{ github.repository }}
         uses: goreleaser/goreleaser-action@v1
         with:
           version: latest
