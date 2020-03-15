@@ -8,10 +8,10 @@ on:
 
 jobs:
   goreleaser:
-    name: Go Releaser
-    env:
-      GOPATH: ${{ github.workspace }}
-      GO111MODULE: off
+    # name: Go Releaser
+    # env:
+    #   GOPATH: ${{ github.workspace }}
+    #   GO111MODULE: off
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
