@@ -24,6 +24,7 @@ jobs:
       #   uses: mxschmitt/action-tmate@v1
 
       - run: dep ensure
+        working-directory: go/src/github.com/${{ github.repository }}
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v1
