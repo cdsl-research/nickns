@@ -1,0 +1,38 @@
+name: goreleaser
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  goreleaser:
+    name: Go Releaser
+    env:
+      GOPATH: ${{ github.workspace }}
+      GO111MODULE: off
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-go@v1
+        with:
+          go-version: '1.13' # The Go version to download (if necessary) and use.
+      - run: go get -u -v github.com/golang/dep/cmd/dep
+      - run: dep ensure
+
+      #- name: Setup tmate session
+      #  uses: mxschmitt/action-tmate@v1
+
+      # - name: Dep ensure
+      #   working-directory: $HOME/go/src/nickns
+      #   run: $HOME/go/bin/dep ensure
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          version: latest
+          args: release --rm-dist
+          key: ${{ secrets.YOUR_PRIVATE_KEY }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
