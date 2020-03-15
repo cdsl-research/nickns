@@ -15,8 +15,7 @@ jobs:
           path: go/src/github.com/${{ github.repository }}
 
       - run: git fetch --prune --unshallow
-        with:
-          path: go/src/github.com/${{ github.repository }}
+        working-directory: go/src/github.com/${{ github.repository }}
 
       - uses: actions/setup-go@v1
         with:
