@@ -1,4 +1,4 @@
-name: goreleaser
+name: Go Release
 
 on:
   push:
@@ -7,8 +7,27 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  goreleaser:
-    # name: Go Releaser
+  common:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Store Variable via file
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifact
+          path: artifact/vars.txt
+
+  specific:
     env:
       GOPATH: ${{ github.workspace }}/go
       GO111MODULE: off
@@ -26,8 +45,18 @@ jobs:
         - os: win64
           goos: windows
           arch: amd64
-
     steps:
+      - name: Get Stored Variable via file
+        uses: actions/download-artifact@v1
+        with:
+          name: artifact
+
+      - name: Set Variable from artifact
+        id: get_vars
+        run: |
+          url=$(cat artifact/vars.txt)
+          echo "::set-output name=upload_url::$url"
+
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
@@ -55,23 +84,12 @@ jobs:
           zip -j -r ${{ github.workspace }}/release dist
         working-directory: go/src/nickns
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.get_vars.outputs.upload_url }}
           asset_path: release.zip
           asset_name: release-${{ matrix.os }}.zip
           asset_content_type: application/zip
