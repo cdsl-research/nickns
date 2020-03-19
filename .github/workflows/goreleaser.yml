@@ -38,6 +38,7 @@ jobs:
     env:
       GOPATH: ${{ github.workspace }}/go
       GO111MODULE: off
+    needs: common
     runs-on: ubuntu-latest
     strategy:
       matrix:
