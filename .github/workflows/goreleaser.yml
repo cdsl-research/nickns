@@ -51,9 +51,9 @@ jobs:
           goarch: ${{ matrix.arch }}
         run: |
           mkdir dist
-          cp test.txt dist/
           GOOS=$goos GOARCH=$goarch go build -v -o dist/app .
           zip -j -r release dist
+        working-directory: go/src/github.com/${{ github.repository }}
 
       - name: Download artifact to get url to upload to release
         uses: actions/download-artifact@v1
