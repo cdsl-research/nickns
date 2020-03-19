@@ -6,6 +6,26 @@ NickNS is DNS Server. This server resolve VM Name into IP Address on VMware ESXi
 
 ## Installation
 
+Download binary file from [here](https://github.com/cdsl-research/nickns/releases/latest).
+
+### wget
+
+On Linux:
+
+```
+wget https://github.com/cdsl-research/nickns/releases/latest/download/release-lin64.zip
+unzip release-lin64.zip
+```
+
+### curl
+
+On Linux:
+
+```
+curl -o release-lin64.zip https://github.com/cdsl-research/nickns/releases/latest/download/release-lin64.zip
+unzip release-lin64.zip
+```
+
 ### go get
 
 ```
