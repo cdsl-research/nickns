@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir dist
           GOOS=$goos GOARCH=$goarch go build -v -o dist/app .
-          zip -j -r release.zip dist
+          zip -j -r ${{ github.workspace }}/release dist
         working-directory: go/src/nickns
 
       - name: Create Release
@@ -75,4 +75,3 @@ jobs:
           asset_path: release.zip
           asset_name: release-${{ matrix.os }}.zip
           asset_content_type: application/zip
-        working-directory: go/src/nickns
