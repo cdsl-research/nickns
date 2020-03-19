@@ -31,7 +31,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
-          path: go/src/github.com/${{ github.repository }}
+          path: go/src/nickns
 
       - name: Setup Go
         uses: actions/setup-go@v1
@@ -43,7 +43,7 @@ jobs:
 
       - name: Install Packages
         run: $GOPATH/bin/dep ensure
-        working-directory: go/src/github.com/${{ github.repository }}
+        working-directory: go/src/nickns
 
       - name: Build
         env:
@@ -53,7 +53,7 @@ jobs:
           mkdir dist
           GOOS=$goos GOARCH=$goarch go build -v -o dist/app .
           zip -j -r release dist
-        working-directory: go/src/github.com/${{ github.repository }}
+        working-directory: go/src/nickns
 
       - name: Download artifact to get url to upload to release
         uses: actions/download-artifact@v1
