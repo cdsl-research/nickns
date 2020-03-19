@@ -1,0 +1,84 @@
+name: goreleaser
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  goreleaser:
+    # name: Go Releaser
+    env:
+      GOPATH: ${{ github.workspace }}/go
+      GO111MODULE: off
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [mac64, lin64, win64]
+        include:
+        - os: mac64
+          goos: darwin
+          arch: amd64
+        - os: lin64
+          goos: linux
+          arch: amd64
+        - os: win64
+          goos: windows
+          arch: amd64
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          path: go/src/github.com/${{ github.repository }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.13'
+
+      - name: Install Dep
+        run: go get -u -v github.com/golang/dep/cmd/dep
+
+      - name: Install Packages
+        run: $GOPATH/bin/dep ensure
+        working-directory: go/src/github.com/${{ github.repository }}
+
+      - name: Build
+        env:
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.arch }}
+        run: |
+          mkdir dist
+          cp test.txt dist/
+          GOOS=$goos GOARCH=$goarch go build -v -o dist/app .
+          zip -j -r release dist
+
+      - name: Download artifact to get url to upload to release
+        uses: actions/download-artifact@v1
+        with:
+          name: artifact
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Released ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          uplaod_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release.zip
+          asset_name: release-${{ matrix.os }}.zip
+          asset_content_type: application/zip`
