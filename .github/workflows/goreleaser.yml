@@ -21,6 +21,13 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Store variable to file
+        env:
+          url: ${{ steps.create_release.outputs.upload_url }}
+        run: |
+          mkdir artifact
+          echo $url > artifact/url.txt
+
       - name: Store Variable via file
         uses: actions/upload-artifact@v1
         with:
