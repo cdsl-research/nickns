@@ -9,7 +9,7 @@ NickNS is DNS Server. This server resolve VM Name into IP Address on VMware ESXi
 ### go get
 
 ```
-$ go get github.com/x-motemen/ghq
+$ go get github.com/cdsl-research/nickns
 ```
 
 ## Usage
