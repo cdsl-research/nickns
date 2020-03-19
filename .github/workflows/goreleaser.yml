@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir dist
           GOOS=$goos GOARCH=$goarch go build -v -o dist/app .
-          zip -j -r release dist
+          zip -j -r release.zip dist
         working-directory: go/src/nickns
 
       - name: Create Release
