@@ -26,7 +26,7 @@ jobs:
           url: ${{ steps.create_release.outputs.upload_url }}
         run: |
           mkdir artifact
-          echo $url > artifact/url.txt
+          echo $url > artifact/vars.txt
 
       - name: Store Variable via file
         uses: actions/upload-artifact@v1
