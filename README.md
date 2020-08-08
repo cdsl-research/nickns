@@ -29,7 +29,7 @@ unzip release-lin64.zip
 ### go get
 
 ```
-$ go get github.com/cdsl-research/nickns
+go get github.com/cdsl-research/nickns
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ $ go get github.com/cdsl-research/nickns
 Generate SSH Key on laptop.
 
 ```
-$ ssh-keygen -t rsa -b 4096
+ssh-keygen -t rsa -b 4096
 ```
 
 Copy SSH key from from laptop to ESXi.
@@ -53,7 +53,7 @@ sftp> puts /path/to/id_rsa.pub /etc/ssh/keys-root/authorized_keys
 Try to connect SSH on Terminal.
 
 ```
-$ ssh -i /path/to/id_rsa root@esxi.example.com
+ssh -i /path/to/id_rsa root@esxi.example.com
 ```
 
 See also: https://kb.vmware.com/s/article/1002866
