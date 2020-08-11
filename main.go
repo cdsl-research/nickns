@@ -98,7 +98,7 @@ func main() {
 	}
 
 	// set path hosts.toml
-	SetEsxiConfigPath("hosts.toml")
+	SetEsxiConfigPath(*hostPathOpt)
 
 	// attach request handler func
 	for _, domain := range confOptions.Domains {
