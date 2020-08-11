@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-nickns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nickns
+  template:
+    metadata:
+      labels:
+        app: nickns
+    spec:
+      containers:
+        - name: ap-nickns
+          image: tomoyk/nickns:v1.0.1
+          ports:
+            - containerPort: 5310
+          args: ["-c", "/conf/config.toml", "-n", "/conf/hosts.toml"]
+          volumeMounts:
+            - name: secret-conf-volume
+              mountPath: /conf
+              readOnly: true
+      restartPolicy: onFailure
+      volumes:
+        - name: secret-conf-volume
+          secret:
+            secretName: nickns-secret-config
+            items:
+              - key: hosts.toml
+                path: /conf/hosts.toml
+                mode: 0400
+              - key: config.toml
+                path: /conf/config.toml
+                mode: 0400
+              - key: id_rsa
+                path: /conf/id_rsa
+                mode: 0400
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nickns
+spec:
+  type: NodePort
+  ports:
+    - name: "http-port"
+      protocol: "TCP"
+      port: 5310
+      targetPort: 5310
+      nodePort: 30053
+  selector:
+    app: nickns

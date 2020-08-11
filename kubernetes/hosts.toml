@@ -1,0 +1,11 @@
+[hostA]
+address = "mint.a910.tak-cslab.org"
+port = "22"
+user = "root"
+identity_file = "/conf/id_rsa"
+
+[hostB]
+address = "jasmine.a910.tak-cslab.org"
+port = "22"
+user = "root"
+identity_file = "/conf/id_rsa"

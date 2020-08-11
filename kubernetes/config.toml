@@ -1,0 +1,3 @@
+port = 5310
+domains = ["local.", "vm.a910.tak-cslab.org."]
+ttl = 3600
