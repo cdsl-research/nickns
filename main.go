@@ -1,13 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
-	"flag"
 
 	. "nickns/resolver"
 
@@ -23,15 +23,13 @@ type configOptions struct {
 }
 
 var (
-	portOpt = flag.Int("p", 5300, "Listening udp port")
-	ttlOpt = flag.Int("t", 3600, "Interval for keeping DNS cache")
 	confPathOpt = flag.String("c", "config.toml", "Path to config.toml")
 	hostPathOpt = flag.String("n", "hosts.toml", "Path to hosts.toml")
 )
 
 var confOptions = configOptions{
-	Port:    *portOpt,
-	TTL:     *ttlOpt,
+	Port:    5300,
+	TTL:     3600,
 	Domains: []string{"local.", "example.com."},
 }
 
@@ -95,9 +93,12 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if _, err := toml.Decode(string(content), &confPathOpt); err != nil {
+	if _, err := toml.Decode(string(content), &confOptions); err != nil {
 		log.Fatalln(err)
 	}
+
+	// set path hosts.toml
+	SetEsxiConfigPath("hosts.toml")
 
 	// attach request handler func
 	for _, domain := range confOptions.Domains {

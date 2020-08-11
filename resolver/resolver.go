@@ -21,6 +21,11 @@ type QueryCache struct {
 type QueryCaches []QueryCache
 */
 
+// Config for esxi hosts info
+func SetEsxiConfigPath(hostFilePath string) {
+	EsxiNodeConfPath = hostFilePath
+}
+
 // Resolve type 'A' record
 func ResolveRecordTypeA(hostname string) string {
 	/* cache hit

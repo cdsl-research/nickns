@@ -28,9 +28,11 @@ type esxiNode struct {
 }
 type esxiNodes map[string]esxiNode
 
+var EsxiNodeConfPath string = "hosts.toml"
+
 // Get SSH Nodes from hosts.toml
 func loadAllEsxiNodes() esxiNodes {
-	content, err := ioutil.ReadFile("hosts.toml")
+	content, err := ioutil.ReadFile(EsxiNodeConfPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
