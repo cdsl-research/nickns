@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"flag"
 
 	. "nickns/resolver"
 
@@ -21,10 +22,17 @@ type configOptions struct {
 	Domains []string
 }
 
+var (
+	portOpt = flag.Int("p", 5300, "Listening udp port")
+	ttlOpt = flag.Int("t", 3600, "Interval for keeping DNS cache")
+	confPathOpt = flag.String("c", "config.toml", "Path to config.toml")
+	hostPathOpt = flag.String("n", "hosts.toml", "Path to hosts.toml")
+)
+
 var confOptions = configOptions{
-	Port:    5300,
-	TTL:     600,
-	Domains: []string{"local.", "a910.tak-cslab.org."},
+	Port:    *portOpt,
+	TTL:     *ttlOpt,
+	Domains: []string{"local.", "example.com."},
 }
 
 func stripDomainName(fqdn string) string {
@@ -79,12 +87,15 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 }
 
 func main() {
+	// parse command line params
+	flag.Parse()
+
 	// load config
-	content, err := ioutil.ReadFile("config.toml")
+	content, err := ioutil.ReadFile(*confPathOpt)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if _, err := toml.Decode(string(content), &confOptions); err != nil {
+	if _, err := toml.Decode(string(content), &confPathOpt); err != nil {
 		log.Fatalln(err)
 	}
 
