@@ -22,7 +22,7 @@ spec:
             - name: secret-conf-volume
               mountPath: /conf
               readOnly: true
-      restartPolicy: OnFailure
+      restartPolicy: Always
       volumes:
         - name: secret-conf-volume
           secret:
