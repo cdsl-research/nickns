@@ -23,6 +23,7 @@ spec:
               mountPath: /conf
               readOnly: true
       restartPolicy: Always
+      dnsPolicy: Default
       volumes:
         - name: secret-conf-volume
           secret:
