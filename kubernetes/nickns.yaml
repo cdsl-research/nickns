@@ -45,8 +45,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - name: "http-port"
-      protocol: "TCP"
+    - name: "dns-port"
+      protocol: "UDP"
       port: 5310
       targetPort: 5310
       nodePort: 30053
