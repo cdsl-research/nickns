@@ -22,20 +22,20 @@ spec:
             - name: secret-conf-volume
               mountPath: /conf
               readOnly: true
-      restartPolicy: onFailure
+      restartPolicy: OnFailure
       volumes:
         - name: secret-conf-volume
           secret:
             secretName: nickns-secret-config
             items:
               - key: hosts.toml
-                path: /conf/hosts.toml
+                path: hosts.toml
                 mode: 0400
               - key: config.toml
-                path: /conf/config.toml
+                path: config.toml
                 mode: 0400
               - key: id_rsa
-                path: /conf/id_rsa
+                path: id_rsa
                 mode: 0400
 ---
 apiVersion: v1
