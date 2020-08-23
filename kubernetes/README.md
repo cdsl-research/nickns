@@ -3,13 +3,24 @@
 Building image
 
 ```
-docker build -t tomoyk/nickns:v1.0 .
+docker build -t cdsl-research/nickns:v1.0.x .
+docker tag cdsl-research/nickns:v1.0.x docker.pkg.github.com/cdsl-research/nickns/nickns:v1.0.x
 ```
 
-Push to dockerhub
+Generate GitHub Token
+
+[create personal access token, save as TOKEN](https://github.com/settings/tokens)
+
+Setup remote registry
 
 ```
-docker push tomoyk/nickns:v1.0
+cat ./TOKEN | docker login docker.pkg.github.com -u <YOUR_USERNAME> --password-stdin
+```
+
+Push to registry
+
+```
+docker push docker.pkg.github.com/cdsl-research/nickns/nickns:v1.0.x
 ```
 
 Create namespace
