@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ap-nickns
-          image: tomoyk/nickns:v1.0.1
+          image: docker.pkg.github.com/cdsl-research/nickns/nickns:v1.0.1
           ports:
             - containerPort: 5310
           args: ["-c", "/conf/config.toml", "-n", "/conf/hosts.toml"]
