@@ -1,0 +1,13 @@
+# NickNS Sample Key
+[Unit]
+Description=Nickns
+
+[Service]
+Type=simple
+ExecStart=/opt/nickns/nickns
+WorkingDirectory=/opt/nickns
+User=nickns
+Group=nickns
+
+[Install]
+WantedBy=multi-user.target
