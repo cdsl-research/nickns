@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	// "github.com/cybozu-go/well"
 	"github.com/BurntSushi/toml"
 	"github.com/miekg/dns"
 )
