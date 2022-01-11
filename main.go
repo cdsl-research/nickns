@@ -3,13 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/cdsl-research/nickns/lib"
 	"io/ioutil"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
-
-	. "nickns/resolver"
 
 	// "github.com/cybozu-go/well"
 	"github.com/BurntSushi/toml"
@@ -55,7 +54,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 			switch q.Qtype {
 			case dns.TypeA:
 				hostname := stripDomainName(q.Name)
-				if ip := ResolveRecordTypeA(hostname); ip != "" {
+				if ip := lib.ResolveRecordTypeA(hostname); ip != "" {
 					log.Printf("[QueryHit] %s => %s\n", q.Name, ip)
 					rr, err := dns.NewRR(fmt.Sprintf("%s %d IN A %s", q.Name, confOptions.TTL, ip))
 					if err == nil {
@@ -65,7 +64,7 @@ func dnsRequestHandler(w dns.ResponseWriter, r *dns.Msg) {
 					log.Printf("[QueryUnHit] %s\n", q.Name)
 				}
 			case dns.TypePTR:
-				if hostname := ResolveRecordTypePTR(q.Name); hostname != "" {
+				if hostname := lib.ResolveRecordTypePTR(q.Name); hostname != "" {
 					for _, domain := range confOptions.Domains {
 						fqdn := hostname + "." + domain
 						log.Printf("[QueryHit] %s => %s\n", q.Name, fqdn)
@@ -98,7 +97,7 @@ func main() {
 	}
 
 	// set path hosts.toml
-	SetEsxiConfigPath(*hostPathOpt)
+	lib.SetEsxiConfigPath(*hostPathOpt)
 
 	// attach request handler func
 	for _, domain := range confOptions.Domains {

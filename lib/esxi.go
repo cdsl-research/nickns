@@ -1,4 +1,4 @@
-package esxi
+package lib
 
 import (
 	"bytes"

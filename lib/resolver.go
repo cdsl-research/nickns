@@ -1,10 +1,8 @@
-package resolver
+package lib
 
 import (
 	"fmt"
 	"strings"
-
-	. "nickns/resolver/esxi"
 )
 
 /*
