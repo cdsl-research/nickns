@@ -1,0 +1,3 @@
+port = 5310
+domains = ["local.", "example.com."]
+ttl = 3600

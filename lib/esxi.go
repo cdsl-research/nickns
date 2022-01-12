@@ -25,6 +25,7 @@ type esxiNode struct {
 	Port         string
 	User         string
 	IdentityFile string `toml:"identity_file"`
+	Password     string
 }
 type esxiNodes map[string]esxiNode
 
@@ -34,12 +35,12 @@ var EsxiNodeConfPath string = "hosts.toml"
 func loadAllEsxiNodes() esxiNodes {
 	content, err := ioutil.ReadFile(EsxiNodeConfPath)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("loading hosts config: ", err)
 	}
 
 	var nodes esxiNodes
 	if _, err := toml.Decode(string(content), &nodes); err != nil {
-		log.Fatalln(err)
+		log.Fatalln("fail to decode as toml: ", err)
 	}
 	/* Debug
 	for key,value := range esxiNodes {
@@ -105,32 +106,33 @@ func GetVmIp(machine Machine) string {
 
 	buf, err := ioutil.ReadFile(node.IdentityFile)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Fail to load identity file: ", err.Error())
 		return ""
 	}
 	key, err := ssh.ParsePrivateKey(buf)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Fail to parse the private key: ", err.Error())
 		return ""
 	}
 	config := &ssh.ClientConfig{
 		User:            node.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Auth: []ssh.AuthMethod{
+			ssh.Password(node.Password),
 			ssh.PublicKeys(key),
 		},
 	}
 
 	conn, err := ssh.Dial("tcp", node.Address+":"+node.Port, config)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Fail to connect as ssh: ", err.Error())
 		return ""
 	}
 	defer conn.Close()
 
 	session, err := conn.NewSession()
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Fail to create a ssh session: ", err.Error())
 		return ""
 	}
 	defer session.Close()
@@ -139,7 +141,7 @@ func GetVmIp(machine Machine) string {
 	session.Stdout = &sshBuf
 	remoteCommand := fmt.Sprintf("vim-cmd vmsvc/get.summary %d | grep ipAddress | grep -o [0-9\\.]\\\\+", machine.Id)
 	if err := session.Run(remoteCommand); err != nil {
-		log.Println(err)
+		log.Println("Fail to run GetVmIp command on ssh: ", err)
 		return ""
 	}
 	return strings.Replace(sshBuf.String(), "\n", "", -1)
@@ -151,11 +153,11 @@ func GetAllVmIdName() Machines {
 	for nodeName, nodeInfo := range loadAllEsxiNodes() {
 		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("Fail to load identity file: ", err)
 		}
 		key, err := ssh.ParsePrivateKey(buf)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("Fail to parse the private key: ", err)
 		}
 
 		// ssh connect
@@ -165,12 +167,14 @@ func GetAllVmIdName() Machines {
 			User:            nodeInfo.User,
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			Auth: []ssh.AuthMethod{
+				ssh.Password(nodeInfo.Password),
 				ssh.PublicKeys(key),
 			},
+			Timeout: 3,
 		}
 		b, err := execCommandSsh(nodeAddr, nodePort, config, "vim-cmd vmsvc/getallvms")
 		if err != nil {
-			log.Println(err.Error())
+			log.Println("Fail to run GetAllVmIdName command on ssh: ", err.Error())
 		}
 
 		// update vm list
@@ -189,11 +193,11 @@ func GetVmIpName(ipAddr string) string {
 	for _, nodeInfo := range loadAllEsxiNodes() {
 		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("Fail to load identity file: ", err)
 		}
 		key, err := ssh.ParsePrivateKey(buf)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("Fail to parse the private key: ", err)
 		}
 
 		// ssh connect
@@ -203,6 +207,7 @@ func GetVmIpName(ipAddr string) string {
 			User:            nodeInfo.User,
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			Auth: []ssh.AuthMethod{
+				ssh.Password(nodeInfo.Password),
 				ssh.PublicKeys(key),
 			},
 		}
@@ -215,7 +220,7 @@ func GetVmIpName(ipAddr string) string {
 		`)
 		// println(b.String())
 		if err != nil {
-			log.Println(err.Error())
+			log.Println("Fail to run GetVmIpName command: ", err.Error())
 		}
 
 		// parse ssh result

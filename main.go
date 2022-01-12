@@ -6,6 +6,7 @@ import (
 	"github.com/cdsl-research/nickns/lib"
 	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -29,6 +30,11 @@ var confOptions = configOptions{
 	Port:    5300,
 	TTL:     3600,
 	Domains: []string{"local.", "example.com."},
+}
+
+func fileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil
 }
 
 func stripDomainName(fqdn string) string {
@@ -87,15 +93,21 @@ func main() {
 	flag.Parse()
 
 	// load config
+	if !fileExists(*confPathOpt) {
+		log.Fatalln("Fail to load ", *confPathOpt)
+	}
 	content, err := ioutil.ReadFile(*confPathOpt)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Fail to read conf file: ", err)
 	}
 	if _, err := toml.Decode(string(content), &confOptions); err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Fail to decode conf as toml: ", err)
 	}
 
 	// set path hosts.toml
+	if !fileExists(*hostPathOpt) {
+		log.Fatalln("Could not load ", *hostPathOpt)
+	}
 	lib.SetEsxiConfigPath(*hostPathOpt)
 
 	// attach request handler func
