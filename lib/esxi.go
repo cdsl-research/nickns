@@ -104,16 +104,21 @@ func GetVmIp(machine Machine) string {
 	nodes := loadAllEsxiNodes()
 	node := nodes[machine.NodeName]
 
-	buf, err := ioutil.ReadFile(node.IdentityFile)
-	if err != nil {
-		log.Println("Fail to load identity file: ", err.Error())
-		return ""
+	var key ssh.Signer
+	// Found identity file
+	if node.IdentityFile != "" {
+		buf, err := ioutil.ReadFile(node.IdentityFile)
+		if err != nil {
+			log.Println("Fail to load identity file: ", err.Error())
+			return ""
+		}
+		key, err = ssh.ParsePrivateKey(buf)
+		if err != nil {
+			log.Println("Fail to parse the private key: ", err.Error())
+			return ""
+		}
 	}
-	key, err := ssh.ParsePrivateKey(buf)
-	if err != nil {
-		log.Println("Fail to parse the private key: ", err.Error())
-		return ""
-	}
+
 	config := &ssh.ClientConfig{
 		User:            node.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
@@ -151,14 +156,20 @@ func GetVmIp(machine Machine) string {
 func GetAllVmIdName() Machines {
 	allVm := Machines{}
 	for nodeName, nodeInfo := range loadAllEsxiNodes() {
-		buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
-		if err != nil {
-			log.Fatalln("Fail to load identity file: ", err)
+
+		var key ssh.Signer
+		// Found identity file
+		if nodeInfo.IdentityFile != "" {
+			buf, err := ioutil.ReadFile(nodeInfo.IdentityFile)
+			if err != nil {
+				log.Fatalln("Fail to load identity file: ", err)
+			}
+			key, err = ssh.ParsePrivateKey(buf)
+			if err != nil {
+				log.Fatalln("Fail to parse the private key: ", err)
+			}
 		}
-		key, err := ssh.ParsePrivateKey(buf)
-		if err != nil {
-			log.Fatalln("Fail to parse the private key: ", err)
-		}
+		println(nodeInfo.User, nodeInfo.Port, nodeInfo.Address, nodeInfo.Password, key)
 
 		// ssh connect
 		nodeAddr := nodeInfo.Address
@@ -168,9 +179,8 @@ func GetAllVmIdName() Machines {
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			Auth: []ssh.AuthMethod{
 				ssh.Password(nodeInfo.Password),
-				ssh.PublicKeys(key),
+				// ssh.PublicKeys(key),
 			},
-			Timeout: 3,
 		}
 		b, err := execCommandSsh(nodeAddr, nodePort, config, "vim-cmd vmsvc/getallvms")
 		if err != nil {
