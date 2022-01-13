@@ -123,7 +123,14 @@ func GetVmIp(machine Machine) string {
 		User:            node.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Auth: []ssh.AuthMethod{
-			ssh.Password(node.Password),
+			ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) (answers []string, err error) {
+				answers = make([]string, len(questions))
+				for i, _ := range answers {
+					answers[i] = node.Password
+				}
+
+				return answers, nil
+			}),
 			ssh.PublicKeys(key),
 		},
 	}
@@ -169,7 +176,6 @@ func GetAllVmIdName() Machines {
 				log.Fatalln("Fail to parse the private key: ", err)
 			}
 		}
-		println(nodeInfo.User, nodeInfo.Port, nodeInfo.Address, nodeInfo.Password, key)
 
 		// ssh connect
 		nodeAddr := nodeInfo.Address
@@ -178,8 +184,15 @@ func GetAllVmIdName() Machines {
 			User:            nodeInfo.User,
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			Auth: []ssh.AuthMethod{
-				ssh.Password(nodeInfo.Password),
-				// ssh.PublicKeys(key),
+				ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) (answers []string, err error) {
+					answers = make([]string, len(questions))
+					for i, _ := range answers {
+						answers[i] = nodeInfo.Password
+					}
+
+					return answers, nil
+				}),
+				ssh.PublicKeys(key),
 			},
 		}
 		b, err := execCommandSsh(nodeAddr, nodePort, config, "vim-cmd vmsvc/getallvms")
@@ -217,7 +230,14 @@ func GetVmIpName(ipAddr string) string {
 			User:            nodeInfo.User,
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			Auth: []ssh.AuthMethod{
-				ssh.Password(nodeInfo.Password),
+				ssh.KeyboardInteractive(func(user, instruction string, questions []string, echos []bool) (answers []string, err error) {
+					answers = make([]string, len(questions))
+					for i, _ := range answers {
+						answers[i] = nodeInfo.Password
+					}
+
+					return answers, nil
+				}),
 				ssh.PublicKeys(key),
 			},
 		}
