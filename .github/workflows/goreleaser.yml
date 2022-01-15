@@ -8,7 +8,7 @@ on:
 
 jobs:
   common:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Create Release
         id: create_release
@@ -37,9 +37,9 @@ jobs:
   specific:
     env:
       GOPATH: ${{ github.workspace }}/go
-      GO111MODULE: off
+      GO111MODULE: on
     needs: common
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         os: [mac64, lin64, win64]
@@ -67,20 +67,14 @@ jobs:
 
       - name: Checkout Code
         uses: actions/checkout@v2
-        with:
-          path: go/src/nickns
 
       - name: Setup Go
         uses: actions/setup-go@v1
         with:
-          go-version: '1.13'
+          go-version: '1.17'
 
-      - name: Install Dep
-        run: go get -u -v github.com/golang/dep/cmd/dep
-
-      - name: Install Packages
-        run: $GOPATH/bin/dep ensure
-        working-directory: go/src/nickns
+      - name: Install modules
+        run: go mod vendor
 
       - name: Build
         env:
@@ -90,7 +84,6 @@ jobs:
           mkdir dist
           GOOS=$goos GOARCH=$goarch go build -v -o dist/app .
           zip -j -r ${{ github.workspace }}/release dist
-        working-directory: go/src/nickns
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
