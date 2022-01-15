@@ -4,6 +4,10 @@ NickNS is DNS Server. This server resolve VM Name into IP Address on VMware ESXi
 
 <img src="https://raw.githubusercontent.com/cdsl-research/nickns/master/overview.png" width=600>
 
+## Versions
+
+- Go 1.17 or later
+
 ## Installation
 
 Download binary file from [here](https://github.com/cdsl-research/nickns/releases/latest).
@@ -29,7 +33,7 @@ unzip release-lin64.zip
 ### go get
 
 ```
-go get github.com/cdsl-research/nickns
+go install github.com/cdsl-research/nickns
 ```
 
 ## Usage
@@ -73,7 +77,7 @@ identity_file = "/path/to/id_rsa"
 address = "esxi.example.com"
 port = "22"
 user = "root"
-identity_file = "~/path/to/id_rsa"
+password = "my_password"
 ```
 
 Set NickNS running options on **config.toml**.
@@ -93,7 +97,16 @@ $ nickns
 2020/03/14 21:40:30 [QueryHit] elastic5.example.com. => 192.168.0.36
 ```
 
-## For Develop
+The command supports config options as follows.
+
+```
+-c string
+      Path to config.toml (default "config.toml")
+-n string
+      Path to hosts.toml (default "hosts.toml")
+```
+
+## Development
 
 Build local ssh server
 
