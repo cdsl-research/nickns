@@ -1,10 +1,10 @@
 # NickNS
 
-NickNS is DNS Server. This server resolve VM Name into IP Address on VMware ESXi.
+NickNS is a DNS Server. This server resolves VM Name into IP Address on VMware ESXi.
 
 <img src="https://raw.githubusercontent.com/cdsl-research/nickns/master/overview.png" width=600>
 
-## Versions
+## Version
 
 - Go 1.17 or later
 
